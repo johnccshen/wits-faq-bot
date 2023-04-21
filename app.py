@@ -22,10 +22,12 @@ def linebot():
         handler.handle(body, signature)
         tk = json_data['events'][0]['replyToken']   # 取得 reply token
         query = json_data['events'][0]['message']['text']
-        if query.startswith('黑姑 '):
-            msg = ask(query.split('黑姑 ')[1], try_answer=True)
-            text_message = TextSendMessage(text=msg)          # 設定回傳同樣的訊息
-            line_bot_api.reply_message(tk, text_message)       # 回傳訊息
+        msg_type = json_data['events'][0]['message']['type']  # 取得 LINe 收到的訊息類型
+        if msg_type == 'text':
+            if query.startswith('黑姑 '):
+                msg = ask(query.split('黑姑 ')[1], try_answer=True)
+                text_message = TextSendMessage(text=msg)          # 設定回傳同樣的訊息
+                line_bot_api.reply_message(tk, text_message)       # 回傳訊息
     except Exception as e:
         tk = json_data['events'][0]['replyToken']   # 取得 reply token
         text_message = TextSendMessage(f'黑姑壞了 {e}')  # 設定回傳同樣的訊息
