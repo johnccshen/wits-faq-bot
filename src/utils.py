@@ -55,7 +55,9 @@ def query_message(
 ) -> str:
     """Return a message for GPT, with relevant source texts pulled from a dataframe."""
     strings, relatednesses = strings_ranked_by_relatedness(query, df)
-    introduction = '運用以下的FAQ來回答問題，並附上聯絡人資訊。如果無法利用FAQ來回答問題，請回答：很抱歉，我無法回答以上問題，請聯絡8855'
+    introduction = '運用以下的FAQ來回答問題，並附上聯絡人資訊及附上英文翻譯。' \
+                   '如果無法利用FAQ來回答問題，請回答：很抱歉，我無法回答以上問題，請聯絡8855。\n' \
+                   'Sorry it is out of my knowledge. Please contact 8855 for further assistance'
     question = f"\n\nQuestion: {query}"
     message = introduction
     for string in strings:
@@ -71,12 +73,12 @@ def query_message(
 
 
 def ask(
-    query: str,
-    df: pd.DataFrame = df,
-    model: str = GPT_MODEL,
-    token_budget: int = 4096 - 500,
-    print_message: bool = False,
-    try_answer: bool = False
+        query: str,
+        df: pd.DataFrame = df,
+        model: str = GPT_MODEL,
+        token_budget: int = 4096 - 500,
+        print_message: bool = False,
+        try_answer: bool = False,
 ) -> str:
     """Answers a query using GPT and a dataframe of relevant texts and embeddings."""
     message = query_message(query, df, model=model, token_budget=token_budget)
@@ -95,7 +97,8 @@ def ask(
     response_message = response["choices"][0]["message"]["content"]
     if '很抱歉，我無法回答以上問題，請聯絡8855。' in response_message and try_answer:
         try_answer_questions = [
-            {"role": "system", "content": "以公司發言人的角度回答問題"},
+            {"role": "system", "content": f"以員工服務中心的角度回答問題"
+                                          f"並附上英文翻譯"},
             {"role": "user", "content": query},
         ]
         try_answer_response = openai.ChatCompletion.create(
@@ -105,4 +108,5 @@ def ask(
         )
         try_answer_message = try_answer_response["choices"][0]["message"]["content"]
         response_message += f"\n\n以下嘗試解決您的問題: {try_answer_message}"
+
     return response_message

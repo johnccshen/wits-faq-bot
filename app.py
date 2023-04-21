@@ -9,6 +9,8 @@ app = Flask(__name__)
 
 LINE_TOKEN = os.getenv('LINE_TOKEN')
 LINE_SECRET_KEY = os.getenv('LINE_SECRET_KEY')
+LEADING_STR_CHINESE = '黑姑 '
+LEADING_STR_ENG = 'Hey Cool '
 
 
 @app.route("/lineBot", methods=['POST'])
@@ -21,11 +23,13 @@ def linebot():
         signature = request.headers['X-Line-Signature']
         handler.handle(body, signature)
         tk = json_data['events'][0]['replyToken']   # 取得 reply token
+        if 'message' not in json_data['events'][0].keys():
+            return 'OK'
         msg_type = json_data['events'][0]['message']['type']  # 取得 LINe 收到的訊息類型
         if msg_type == 'text':
             query = json_data['events'][0]['message']['text']
-            if query.startswith('黑姑 '):
-                msg = ask(query.split('黑姑 ')[1], try_answer=True)
+            if query.startswith(LEADING_STR_CHINESE):
+                msg = ask(query.split(LEADING_STR_CHINESE)[1], try_answer=True)
                 text_message = TextSendMessage(text=msg)          # 設定回傳同樣的訊息
                 line_bot_api.reply_message(tk, text_message)       # 回傳訊息
     except Exception as e:
