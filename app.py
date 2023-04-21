@@ -7,8 +7,8 @@ from src.utils import ask
 app = Flask(__name__)
 
 
-TOKEN = '+mqfvqIy7MMISHmF/5gUXuLeUqEcuoPI/6UYDAcSUaUhUEtJlArYjXhm/ivrMjGfCWdrKHj4DkvzM80cBjh8a/2LdKMBdf1ZoMF+PnGH2CB2XGYRzVfPrEXDPMAAjPYMZSAWNtPzM70Gm93IfT8n8QdB04t89/1O/w1cDnyilFU='
-SECRET_KEY = '6959c926d74bad49790d84e158556528'
+LINE_TOKEN = os.getenv('LINE_TOKEN')
+LINE_SECRET_KEY = os.getenv('LINE_SECRET_KEY')
 
 
 @app.route("/lineBot", methods=['POST'])
@@ -17,8 +17,8 @@ def linebot():
     json_data = json.loads(body)
     print(json_data)
     try:
-        line_bot_api = LineBotApi(TOKEN)
-        handler = WebhookHandler(SECRET_KEY)
+        line_bot_api = LineBotApi(LINE_TOKEN)
+        handler = WebhookHandler(LINE_SECRET_KEY)
         signature = request.headers['X-Line-Signature']
         handler.handle(body, signature)
         tk = json_data['events'][0]['replyToken']   # 取得 reply token
