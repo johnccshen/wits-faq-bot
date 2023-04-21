@@ -22,12 +22,16 @@ def linebot():
         signature = request.headers['X-Line-Signature']
         handler.handle(body, signature)
         tk = json_data['events'][0]['replyToken']   # 取得 reply token
-        if tk.startswith('黑姑 '):
-            msg = ask('黑姑 '.split('黑姑 ')[0], try_answer=True)
+        query = json_data['events'][0]['message']['text']
+        if query.startswith('黑姑 '):
+            msg = ask(query.split('黑姑 ')[0], try_answer=True)
             text_message = TextSendMessage(text=msg)          # 設定回傳同樣的訊息
             line_bot_api.reply_message(tk, text_message)       # 回傳訊息
     except Exception as e:
-        print(e)
+        tk = json_data['events'][0]['replyToken']   # 取得 reply token
+        text_message = TextSendMessage(f'黑姑壞了 {e}')  # 設定回傳同樣的訊息
+        line_bot_api = LineBotApi(LINE_TOKEN)
+        line_bot_api.reply_message(tk, text_message)  # 回傳訊息
     return 'OK'
 
 
