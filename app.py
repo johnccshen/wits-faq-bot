@@ -30,6 +30,10 @@ def linebot():
             query = json_data['events'][0]['message']['text']
             if query.startswith(LEADING_STR_CHINESE):
                 msg = ask(query.split(LEADING_STR_CHINESE)[1], try_answer=True)
+                text_message = TextSendMessage(text=msg)  # 設定回傳同樣的訊息
+                line_bot_api.reply_message(tk, text_message)  # 回傳訊息
+            elif query.startswith(LEADING_STR_ENG):
+                msg = ask(query.split(LEADING_STR_ENG)[1], try_answer=True)
                 text_message = TextSendMessage(text=msg)          # 設定回傳同樣的訊息
                 line_bot_api.reply_message(tk, text_message)       # 回傳訊息
     except Exception as e:
@@ -41,6 +45,6 @@ def linebot():
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
-    # print(ask('怎麼請假', try_answer=True))
+    # port = int(os.environ.get('PORT', 5000))
+    # app.run(host='0.0.0.0', port=port)
+    print(ask('怎麼請假', try_answer=True))

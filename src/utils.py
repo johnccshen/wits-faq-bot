@@ -55,9 +55,9 @@ def query_message(
 ) -> str:
     """Return a message for GPT, with relevant source texts pulled from a dataframe."""
     strings, relatednesses = strings_ranked_by_relatedness(query, df)
-    introduction = '運用以下的FAQ來回答問題，並附上聯絡人資訊及附上英文翻譯。' \
-                   '如果無法利用FAQ來回答問題，請回答：很抱歉，我無法回答以上問題，請聯絡8855。\n' \
-                   'Sorry it is out of my knowledge. Please contact 8855 for further assistance'
+    introduction = '運用以下的FAQ來回答問題，並附上聯絡人資訊。' \
+                   '如果無法利用FAQ來回答問題，請回答：(很抱歉，我無法回答以上問題，請聯絡8855。\n' \
+                   'Sorry it is out of my knowledge. Please contact 8855 for further assistance)'
     question = f"\n\nQuestion: {query}"
     message = introduction
     for string in strings:
@@ -97,8 +97,7 @@ def ask(
     response_message = response["choices"][0]["message"]["content"]
     if '很抱歉，我無法回答以上問題，請聯絡8855。' in response_message and try_answer:
         try_answer_questions = [
-            {"role": "system", "content": f"以員工服務中心的角度回答問題"
-                                          f"並附上英文翻譯"},
+            {"role": "system", "content": f"以員工服務中心的角度回答問題"},
             {"role": "user", "content": query},
         ]
         try_answer_response = openai.ChatCompletion.create(
