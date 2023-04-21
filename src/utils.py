@@ -95,7 +95,7 @@ def ask(
     response_message = response["choices"][0]["message"]["content"]
     if '很抱歉，我無法回答以上問題，請聯絡8855。' in response_message and try_answer:
         try_answer_questions = [
-            {"role": "system", "content": "以算命師的風格回答問題"},
+            {"role": "system", "content": "以公司發言人的角度回答問題"},
             {"role": "user", "content": query},
         ]
         try_answer_response = openai.ChatCompletion.create(
@@ -104,5 +104,5 @@ def ask(
             temperature=0.8
         )
         try_answer_message = try_answer_response["choices"][0]["message"]["content"]
-        response_message += f"\n嘗試解決您的問題: {try_answer_message}"
+        response_message += f"\n\n嘗試解決您的問題: {try_answer_message}"
     return response_message
