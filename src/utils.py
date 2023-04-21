@@ -1,16 +1,18 @@
 # imports
 import ast  # for converting embeddings saved as strings back to arrays
+import os
+
 import openai  # for calling the OpenAI API
 import pandas as pd  # for storing text and embeddings data
 import tiktoken  # for counting tokens
 from scipy import spatial  # for calculating vector similarities for search
 
-
+openai.api_key = os.getenv('OPENAI_WITS_API_KEY')
 # models
 EMBEDDING_MODEL = "text-embedding-ada-002"
 GPT_MODEL = "gpt-3.5-turbo"
 
-embeddings_path = "../data/embadding_v1.csv"
+embeddings_path = "src/embedding_v1.csv"
 
 df = pd.read_csv(embeddings_path)
 # convert embeddings from CSV str type back to list type
@@ -53,7 +55,7 @@ def query_message(
 ) -> str:
     """Return a message for GPT, with relevant source texts pulled from a dataframe."""
     strings, relatednesses = strings_ranked_by_relatedness(query, df)
-    introduction = '運用以下的FAQ來回答問題，並附上聯絡人資訊。如果無法利用FAQ來回答問題，請回答：很抱歉，我無法回答以上問題，請聯絡8855'
+    introduction = '運用以下的FAQ來回答問題，並附上承辦人資訊。如果無法利用FAQ來回答問題，請回答：很抱歉，我無法回答以上問題，請聯絡8855'
     question = f"\n\nQuestion: {query}"
     message = introduction
     for string in strings:
@@ -65,16 +67,6 @@ def query_message(
             break
         else:
             message += next_article
-    return message + question
-
-
-def try_answer_query_message(
-    query: str,
-) -> str:
-    """Return a message for GPT, with relevant source texts pulled from a dataframe."""
-    introduction = '請以社工的角度溫柔地回答問題'
-    question = f"\n\nQuestion: {query}"
-    message = introduction
     return message + question
 
 
