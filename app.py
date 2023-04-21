@@ -45,6 +45,6 @@ def linebot():
 
 
 if __name__ == "__main__":
-    # port = int(os.environ.get('PORT', 5000))
-    # app.run(host='0.0.0.0', port=port)
-    print(ask('怎麼請假', try_answer=True))
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
+    # print(ask('怎麼請假', try_answer=True))
