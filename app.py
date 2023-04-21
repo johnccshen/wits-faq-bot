@@ -26,9 +26,6 @@ def linebot():
             msg = ask(query.split('黑姑 ')[1], try_answer=True)
             text_message = TextSendMessage(text=msg)          # 設定回傳同樣的訊息
             line_bot_api.reply_message(tk, text_message)       # 回傳訊息
-        else:
-            text_message = TextSendMessage(text=query)
-            line_bot_api.reply_message(tk, text_message)  # 回傳訊息
     except Exception as e:
         tk = json_data['events'][0]['replyToken']   # 取得 reply token
         text_message = TextSendMessage(f'黑姑壞了 {e}')  # 設定回傳同樣的訊息
