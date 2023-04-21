@@ -7,3 +7,7 @@ export OPENAI_API_ORGANIZATIOn = {API_ORG}
 
 ## install Python package
 pip install -r requirements.txt
+python -m spacy download zh_core_web_sm
+
+# Questions of FAQ
+
