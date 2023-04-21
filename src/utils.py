@@ -12,7 +12,7 @@ openai.api_key = os.getenv('OPENAI_WITS_API_KEY')
 EMBEDDING_MODEL = "text-embedding-ada-002"
 GPT_MODEL = "gpt-3.5-turbo"
 
-embeddings_path = "src/embedding_v1.csv"
+embeddings_path = "src/embedding_v2.csv"
 
 df = pd.read_csv(embeddings_path)
 # convert embeddings from CSV str type back to list type
