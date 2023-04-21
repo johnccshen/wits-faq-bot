@@ -84,7 +84,7 @@ def ask(
         print(message)
     messages = [
         # {"role": "system", "content": "You answer questions about the 2022 Winter Olympics."},
-        {"role": "system", "content": "請回答有關FAQ的問題"},
+        {"role": "system", "content": "回答有關FAQ的問題"},
         {"role": "user", "content": message},
     ]
     response = openai.ChatCompletion.create(
@@ -104,5 +104,5 @@ def ask(
             temperature=0.8
         )
         try_answer_message = try_answer_response["choices"][0]["message"]["content"]
-        response_message += f"\n\n嘗試解決您的問題: {try_answer_message}"
+        response_message += f"\n\n以下嘗試解決您的問題: {try_answer_message}"
     return response_message
