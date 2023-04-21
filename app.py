@@ -33,7 +33,8 @@ def linebot():
                 text_message = TextSendMessage(text=msg)  # 設定回傳同樣的訊息
                 line_bot_api.reply_message(tk, text_message)  # 回傳訊息
             elif query.startswith(LEADING_STR_ENG):
-                msg = ask(query.split(LEADING_STR_ENG)[1], try_answer=True)
+                question = query.split(LEADING_STR_ENG)[1] + 'and answer in English'
+                msg = ask(question, try_answer=True)
                 text_message = TextSendMessage(text=msg)          # 設定回傳同樣的訊息
                 line_bot_api.reply_message(tk, text_message)       # 回傳訊息
     except Exception as e:
