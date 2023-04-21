@@ -3,8 +3,9 @@ from linebot import LineBotApi, WebhookHandler
 from linebot.models import TextSendMessage   # 載入 TextSendMessage 模組
 import os
 import json
-
+from src.utils import ask
 app = Flask(__name__)
+
 
 TOKEN = '+mqfvqIy7MMISHmF/5gUXuLeUqEcuoPI/6UYDAcSUaUhUEtJlArYjXhm/ivrMjGfCWdrKHj4DkvzM80cBjh8a/2LdKMBdf1ZoMF+PnGH2CB2XGYRzVfPrEXDPMAAjPYMZSAWNtPzM70Gm93IfT8n8QdB04t89/1O/w1cDnyilFU='
 SECRET_KEY = '6959c926d74bad49790d84e158556528'
@@ -21,10 +22,10 @@ def linebot():
         signature = request.headers['X-Line-Signature']
         handler.handle(body, signature)
         tk = json_data['events'][0]['replyToken']   # 取得 reply token
-        print(json_data)
-        msg = json_data['events'][0]['message']['text']   # 取得使用者發送的訊息
-        text_message = TextSendMessage(text=msg)          # 設定回傳同樣的訊息
-        line_bot_api.reply_message(tk, text_message)       # 回傳訊息
+        if tk.startwith('黑姑 '):
+            msg = ask('黑姑 '.split('黑姑 ')[0], try_answer=True)
+            text_message = TextSendMessage(text=msg)          # 設定回傳同樣的訊息
+            line_bot_api.reply_message(tk, text_message)       # 回傳訊息
     except Exception as e:
         print(e)
     return 'OK'
