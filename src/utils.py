@@ -55,7 +55,9 @@ def query_message(
 ) -> str:
     """Return a message for GPT, with relevant source texts pulled from a dataframe."""
     strings, relatednesses = strings_ranked_by_relatedness(query, df)
-    introduction = '運用以下的FAQ來回答問題，並附上聯絡人資訊。' \
+    introduction = 'The following is a conversation with an AI assistant. ' \
+                   'The assistant is helpful, creative, clever, and very friendly.' \
+                   '運用以下的FAQ來回答問題，並附上聯絡人資訊。' \
                    '如果無法利用FAQ來回答問題，請回答：(很抱歉，我無法回答以上問題，請聯絡8855。\n' \
                    'Sorry it is out of my knowledge. Please contact 8855 for further assistance)'
     question = f"\n\nQuestion: {query}"
@@ -97,7 +99,8 @@ def ask(
     response_message = response["choices"][0]["message"]["content"]
     if '很抱歉，我無法回答以上問題，請聯絡8855。' in response_message and try_answer:
         try_answer_questions = [
-            {"role": "system", "content": f"以員工服務中心的角度回答問題"},
+            {"role": "system", "content": "以下是一個和AI助理的對話，這個助理非常的有同理心、有創造力並非常友善"},
+            {"role": "system", "content": "請問我能如何協助你？"},
             {"role": "user", "content": query},
         ]
         try_answer_response = openai.ChatCompletion.create(
@@ -107,5 +110,19 @@ def ask(
         )
         try_answer_message = try_answer_response["choices"][0]["message"]["content"]
         response_message += f"\n\n以下嘗試解決您的問題: {try_answer_message}"
+    elif 'Sorry it is out of my knowledge. Please contact 8855 for further assistance' in response_message and try_answer:
+        try_answer_questions = [
+            {"role": "system", "content": "'The following is a conversation with an AI assistant. "
+                                          "The assistant is helpful, creative, clever, and very friendly.'"},
+            {"role": "system", "content": "How can I help you"},
+            {"role": "user", "content": query},
+        ]
+        try_answer_response = openai.ChatCompletion.create(
+            model=model,
+            messages=try_answer_questions,
+            temperature=0.8
+        )
+        try_answer_message = try_answer_response["choices"][0]["message"]["content"]
+        response_message += f"\n\nTry to answer your question: {try_answer_message}"
 
     return response_message
