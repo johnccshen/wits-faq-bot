@@ -1,4 +1,3 @@
-# imports
 import ast  # for converting embeddings saved as strings back to arrays
 import os
 
@@ -109,7 +108,8 @@ def ask(
             temperature=0.8
         )
         try_answer_message = try_answer_response["choices"][0]["message"]["content"]
-        response_message += f"\n\n以下嘗試解決您的問題: {try_answer_message}"
+
+        response_message = try_answer_message + "\n如以上回答無法幫助到你，請聯絡8855，將有專人為您服務。"
     elif 'Sorry it is out of my knowledge. Please contact 8855 for further assistance' in response_message and try_answer:
         try_answer_questions = [
             {"role": "system", "content": "'The following is a conversation with an AI assistant. "
@@ -123,6 +123,6 @@ def ask(
             temperature=0.8
         )
         try_answer_message = try_answer_response["choices"][0]["message"]["content"]
-        response_message += f"\n\nTry to answer your question: {try_answer_message}"
+        response_message = try_answer_message + "\nIf the above answer can't help you, please contact 8855 for further assistance."
 
     return response_message
