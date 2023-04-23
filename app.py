@@ -1,6 +1,6 @@
 from flask import Flask, request
 from linebot import LineBotApi, WebhookHandler
-from linebot.models import TextSendMessage, ConfirmTemplate   # 載入 TextSendMessage 模組
+from linebot.models import TextSendMessage, ConfirmTemplate, MessageTemplateAction   # 載入 TextSendMessage 模組
 import os
 import json
 import structlog
@@ -34,15 +34,32 @@ def linebot():
         if msg_type == 'text':
             query = json_data['events'][0]['message']['text']
             if query.startswith(LEADING_STR_CHINESE):
-                msg = faq_bot.ask(query.split(LEADING_STR_CHINESE)[1], try_answer=True)
+                question = query.split(LEADING_STR_CHINESE)[1]
             elif query.startswith(LEADING_STR_ENG):
                 question = query.split(LEADING_STR_ENG)[1] + 'and answer in English'
-                msg = faq_bot.ask(question, try_answer=True)
             else:
                 return 'OK'
-            msg += f"\nCost: {faq_bot.total_cost:.6f}"
-            text_message = ConfirmTemplate(text=msg)          # 設定回傳同樣的訊息
-            line_bot_api.reply_message(tk, text_message)       # 回傳訊息
+            is_success, msg = faq_bot.ask(question)
+            if not is_success:
+                general_ans = faq_bot.general_ask(question)
+                msg += general_ans
+            msg += f"\nOpenAI Cost: {faq_bot.total_cost:.6f}"
+            text_message = TextSendMessage(text=msg, actions=['Yes', 'No'])
+            confirm_message = ConfirmTemplate(
+                title='ConfirmTemplate',
+                text='Are you satisfied with the answer?',
+                actions=[
+                    MessageTemplateAction(
+                        label='Yes',
+                        text='yes',
+                    ),
+                    MessageTemplateAction(
+                        label='N',
+                        text='no'
+                    )
+                ]
+            )
+            line_bot_api.reply_message(tk, [text_message, confirm_message])       # 回傳訊息
     except Exception as e:
         tk = json_data['events'][0]['replyToken']   # 取得 reply token
         text_message = TextSendMessage(f'黑姑壞了 {e}')  # 設定回傳同樣的訊息

@@ -68,9 +68,9 @@ class FaqBot:
             model: str = GPT_MODEL,
             token_budget: int = 4096 - 500,
             print_message: bool = False,
-            try_answer: bool = False,
-    ) -> str:
+    ) -> (bool, str):
         """Answers a query using GPT and a dataframe of relevant texts and embeddings."""
+        is_succeed = True
         message = self.query_message(query, df, model=model, token_budget=token_budget)
         if print_message:
             print(message)
@@ -81,18 +81,14 @@ class FaqBot:
         cost, response = self.openai_completion_service.completion(messages)
         self.total_cost += cost
         response_message = response["choices"][0]["message"]["content"]
-        if '很抱歉，我無法回答以上問題，請聯絡8855。' in response_message and try_answer:
-            try_answer_questions = [
-                {"role": "system", "content": "以下是一個和AI助理的對話，這個助理非常的有同理心、有創造力並非常友善"},
-                {"role": "system", "content": "請問我能如何協助你？"},
-                {"role": "user", "content": query},
-            ]
-            cost, try_answer_response = self.openai_completion_service.completion(try_answer_questions, temperature=0.8)
-            self.total_cost += cost
-            try_answer_message = try_answer_response["choices"][0]["message"]["content"]
+        if '很抱歉，我無法回答以上問題，請聯絡8855。' in response_message:
+            is_succeed = False
+        elif 'Sorry it is out of my knowledge. Please contact 8855 for further assistance' in response_message:
+            is_succeed = False
+        return is_succeed, response_message
 
-            response_message = try_answer_message + "\n\n如以上回答無法幫助到你，請撥打 +886-2-7745-8888#8855，將有專人為您服務。"
-        elif 'Sorry it is out of my knowledge. Please contact 8855 for further assistance' in response_message and try_answer:
+    def general_ask(self, query):
+        if 'answer in english' in query:
             try_answer_questions = [
                 {"role": "system", "content": "'The following is a conversation with an AI assistant. "
                                               "The assistant is helpful, creative, clever, and very friendly.'"},
@@ -104,5 +100,14 @@ class FaqBot:
             try_answer_message = try_answer_response["choices"][0]["message"]["content"]
             response_message = try_answer_message + \
                                "\n\nIf the above answer can't help you, please contact +886-2-7745-8888#8855 for further assistance."
-
+        else:
+            try_answer_questions = [
+                {"role": "system", "content": "以下是一個和AI助理的對話，這個助理非常的有同理心、有創造力並非常友善"},
+                {"role": "system", "content": "請問我能如何協助你？"},
+                {"role": "user", "content": query},
+            ]
+            cost, try_answer_response = self.openai_completion_service.completion(try_answer_questions, temperature=0.8)
+            self.total_cost += cost
+            try_answer_message = try_answer_response["choices"][0]["message"]["content"]
+            response_message = try_answer_message + "\n\n如以上回答無法幫助到你，請撥打 +886-2-7745-8888#8855，將有專人為您服務。"
         return response_message
