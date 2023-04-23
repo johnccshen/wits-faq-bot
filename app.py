@@ -32,10 +32,10 @@ def linebot():
             return 'OK'
         for event in json_data['events']:
             if 'postback' in event.keys():
-                if event['postback']['data']== 'send notification to administrator':
+                if event['postback']['data'] == 'send notification to administrator':
                     line_bot_api.reply_message(tk, TextSendMessage(text='已傳送訊息給管理員，將有專人與您聯絡'))  # 回傳訊息
             if 'message' in event.keys():
-                if event['message']['type'] == 'text'
+                if event['message']['type'] == 'text':
                     messages = []
                     query = json_data['events'][0]['message']['text']
                     if query.startswith(LEADING_STR_CHINESE):
@@ -49,27 +49,26 @@ def linebot():
                         msg = faq_bot.general_ask(question)
                     msg += f"\nOpenAI Cost: {faq_bot.total_cost:.6f}"
                     messages.append(TextSendMessage(text=msg))
-                    if is_success:
-                        messages.append(
-                            TemplateSendMessage(
-                                alt_text='Confirm Message',
-                                template=ConfirmTemplate(
-                                    title='ConfirmTemplate',
-                                    text='Are you satisfied with the answer?',
-                                    actions=[
-                                        MessageTemplateAction(
-                                            label='Yes',
-                                            text='yes',
-                                        ),
-                                        PostbackTemplateAction(
-                                            label='No',
-                                            text='no',
-                                            data='send notification to administrator'
-                                        )
-                                    ]
-                                )
+                    messages.append(
+                        TemplateSendMessage(
+                            alt_text='Confirm Message',
+                            template=ConfirmTemplate(
+                                title='ConfirmTemplate',
+                                text='Are you satisfied with the answer?',
+                                actions=[
+                                    MessageTemplateAction(
+                                        label='Yes',
+                                        text='yes',
+                                    ),
+                                    PostbackTemplateAction(
+                                        label='No',
+                                        text='no',
+                                        data='send notification to administrator'
+                                    )
+                                ]
                             )
                         )
+                    )
                     line_bot_api.reply_message(tk, messages)       # 回傳訊息
     except Exception as e:
         tk = json_data['events'][0]['replyToken']   # 取得 reply token
