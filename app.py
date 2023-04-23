@@ -3,7 +3,7 @@ from linebot import LineBotApi, WebhookHandler
 from linebot.models import TextSendMessage   # 載入 TextSendMessage 模組
 import os
 import json
-from src.utils import ask
+from src.faq_bot import FaqBot
 app = Flask(__name__)
 
 
@@ -12,6 +12,8 @@ LINE_SECRET_KEY = os.getenv('LINE_SECRET_KEY')
 LEADING_STR_CHINESE = '黑姑 '
 LEADING_STR_ENG = 'Hey Cool '
 
+
+faq_bot = FaqBot()
 
 @app.route("/lineBot", methods=['POST'])
 def linebot():
@@ -29,14 +31,15 @@ def linebot():
         if msg_type == 'text':
             query = json_data['events'][0]['message']['text']
             if query.startswith(LEADING_STR_CHINESE):
-                msg = ask(query.split(LEADING_STR_CHINESE)[1], try_answer=True)
+                msg = faq_bot.ask(query.split(LEADING_STR_CHINESE)[1], try_answer=True)
                 text_message = TextSendMessage(text=msg)  # 設定回傳同樣的訊息
                 line_bot_api.reply_message(tk, text_message)  # 回傳訊息
             elif query.startswith(LEADING_STR_ENG):
                 question = query.split(LEADING_STR_ENG)[1] + 'and answer in English'
-                msg = ask(question, try_answer=True)
+                msg = faq_bot.ask(question, try_answer=True)
                 text_message = TextSendMessage(text=msg)          # 設定回傳同樣的訊息
                 line_bot_api.reply_message(tk, text_message)       # 回傳訊息
+                line_bot_api.reply_message(tk, TextSendMessage(f"Cost: {faq_bot.total_cost:.6f}"))       # 回傳訊息
     except Exception as e:
         tk = json_data['events'][0]['replyToken']   # 取得 reply token
         text_message = TextSendMessage(f'黑姑壞了 {e}')  # 設定回傳同樣的訊息
@@ -48,4 +51,6 @@ def linebot():
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
-    # print(ask('Who is Ching?', try_answer=True))
+    # print(faq_bot.ask('Why my boss is stupid and answer in English', print_message=False, try_answer=True))
+    # print(f"Cost: {faq_bot.total_cost:.6f}")
+
