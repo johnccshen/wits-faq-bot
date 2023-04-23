@@ -28,8 +28,6 @@ def linebot():
         signature = request.headers['X-Line-Signature']
         handler.handle(body, signature)
         tk = json_data['events'][0]['replyToken']   # 取得 reply token
-        if 'message' not in json_data['events'][0].keys():
-            return 'OK'
         for event in json_data['events']:
             logger.info(event)
             if event.get('postback'):
@@ -85,4 +83,3 @@ if __name__ == "__main__":
     app.run(host='0.0.0.0', port=port)
     # print(faq_bot.ask('Why my boss is stupid and answer in English', print_message=False, try_answer=True))
     # print(f"Cost: {faq_bot.total_cost:.6f}")
-
