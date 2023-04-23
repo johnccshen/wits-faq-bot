@@ -30,46 +30,47 @@ def linebot():
         tk = json_data['events'][0]['replyToken']   # 取得 reply token
         if 'message' not in json_data['events'][0].keys():
             return 'OK'
-        msg_type = json_data['events'][0]['message']['type']  # 取得 LINe 收到的訊息類型
-        if msg_type == 'text':
-            messages = []
-            query = json_data['events'][0]['message']['text']
-            if query.startswith(LEADING_STR_CHINESE):
-                question = query.split(LEADING_STR_CHINESE)[1]
-            elif query.startswith(LEADING_STR_ENG):
-                question = query.split(LEADING_STR_ENG)[1] + 'and answer in English'
-            elif query == 'send notification to administrator':
-                line_bot_api.reply_message(tk, TextSendMessage(text='已傳送訊息給管理員，將有專人與您聯絡'))  # 回傳訊息
-                return 'OK'
-            else:
-                return 'OK'
-            is_success, msg = faq_bot.ask(question)
-            if not is_success:
-                msg = faq_bot.general_ask(question)
-            msg += f"\nOpenAI Cost: {faq_bot.total_cost:.6f}"
-            messages.append(TextSendMessage(text=msg))
-            if is_success:
-                messages.append(
-                    TemplateSendMessage(
-                        alt_text='Confirm Message',
-                        template=ConfirmTemplate(
-                            title='ConfirmTemplate',
-                            text='Are you satisfied with the answer?',
-                            actions=[
-                                MessageTemplateAction(
-                                    label='Yes',
-                                    text='yes',
-                                ),
-                                PostbackTemplateAction(
-                                    label='No',
-                                    text='no',
-                                    data='send notification to administrator'
+        for event in json_data['events']:
+            if 'postback' in event.keys():
+                if event['postback']['data']== 'send notification to administrator':
+                    line_bot_api.reply_message(tk, TextSendMessage(text='已傳送訊息給管理員，將有專人與您聯絡'))  # 回傳訊息
+            if 'message' in event.keys():
+                if event['message']['type'] == 'text'
+                    messages = []
+                    query = json_data['events'][0]['message']['text']
+                    if query.startswith(LEADING_STR_CHINESE):
+                        question = query.split(LEADING_STR_CHINESE)[1]
+                    elif query.startswith(LEADING_STR_ENG):
+                        question = query.split(LEADING_STR_ENG)[1] + 'and answer in English'
+                    else:
+                        return 'OK'
+                    is_success, msg = faq_bot.ask(question)
+                    if not is_success:
+                        msg = faq_bot.general_ask(question)
+                    msg += f"\nOpenAI Cost: {faq_bot.total_cost:.6f}"
+                    messages.append(TextSendMessage(text=msg))
+                    if is_success:
+                        messages.append(
+                            TemplateSendMessage(
+                                alt_text='Confirm Message',
+                                template=ConfirmTemplate(
+                                    title='ConfirmTemplate',
+                                    text='Are you satisfied with the answer?',
+                                    actions=[
+                                        MessageTemplateAction(
+                                            label='Yes',
+                                            text='yes',
+                                        ),
+                                        PostbackTemplateAction(
+                                            label='No',
+                                            text='no',
+                                            data='send notification to administrator'
+                                        )
+                                    ]
                                 )
-                            ]
+                            )
                         )
-                    )
-                )
-            line_bot_api.reply_message(tk, messages)       # 回傳訊息
+                    line_bot_api.reply_message(tk, messages)       # 回傳訊息
     except Exception as e:
         tk = json_data['events'][0]['replyToken']   # 取得 reply token
         text_message = TextSendMessage(f'黑姑壞了 {e}')  # 設定回傳同樣的訊息
