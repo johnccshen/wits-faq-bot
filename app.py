@@ -31,13 +31,13 @@ def linebot():
         if 'message' not in json_data['events'][0].keys():
             return 'OK'
         for event in json_data['events']:
+            logger.info(event)
             if event.get('postback'):
-                logger.info(event)
                 line_bot_api.reply_message(tk, TextSendMessage(text=event['postback']['data']))
             if event.get('message'):
                 if event['message']['type'] == 'text':
                     messages = []
-                    query = json_data['events'][0]['message']['text']
+                    query = event['message']['text']
                     if query.startswith(LEADING_STR_CHINESE):
                         question = query.split(LEADING_STR_CHINESE)[1]
                     elif query.startswith(LEADING_STR_ENG):
