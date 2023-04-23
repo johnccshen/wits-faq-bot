@@ -41,25 +41,24 @@ def linebot():
                 return 'OK'
             is_success, msg = faq_bot.ask(question)
             if not is_success:
-                general_ans = faq_bot.general_ask(question)
-                msg += general_ans
+                msg = faq_bot.general_ask(question)
             msg += f"\nOpenAI Cost: {faq_bot.total_cost:.6f}"
-            text_message = TextSendMessage(text=msg, actions=['Yes', 'No'])
-            # confirm_message = ConfirmTemplate(
-            #     title='ConfirmTemplate',
-            #     text='Are you satisfied with the answer?',
-            #     actions=[
-            #         MessageTemplateAction(
-            #             label='Yes',
-            #             text='yes',
-            #         ),
-            #         MessageTemplateAction(
-            #             label='N',
-            #             text='no'
-            #         )
-            #     ]
-            # )
-            line_bot_api.reply_message(tk, [text_message])       # 回傳訊息
+            text_message = TextSendMessage(text=msg)
+            confirm_message = ConfirmTemplate(
+                title='ConfirmTemplate',
+                text='Are you satisfied with the answer?',
+                actions=[
+                    MessageTemplateAction(
+                        label='Yes',
+                        text='yes',
+                    ),
+                    MessageTemplateAction(
+                        label='No',
+                        text='no'
+                    )
+                ]
+            )
+            line_bot_api.reply_message(tk, [text_message, confirm_message])       # 回傳訊息
     except Exception as e:
         tk = json_data['events'][0]['replyToken']   # 取得 reply token
         text_message = TextSendMessage(f'黑姑壞了 {e}')  # 設定回傳同樣的訊息
