@@ -54,14 +54,15 @@ def linebot():
                                 title='ConfirmTemplate',
                                 text='Are you satisfied with the answer?',
                                 actions=[
-                                    MessageTemplateAction(
+                                    PostbackTemplateAction(
                                         label='Yes',
                                         text='yes',
+                                        data='Thank you for loving the service. 😎'
                                     ),
                                     PostbackTemplateAction(
                                         label='No',
                                         text='no',
-                                        data='send notification to administrator'
+                                        data='Send notification to administrator.'
                                     )
                                 ]
                             )
