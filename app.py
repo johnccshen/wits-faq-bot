@@ -1,6 +1,6 @@
 from flask import Flask, request
 from linebot import LineBotApi, WebhookHandler
-from linebot.models import TextSendMessage, ConfirmTemplate, MessageTemplateAction, TemplateSendMessage
+from linebot.models import TextSendMessage, ConfirmTemplate, MessageTemplateAction, TemplateSendMessage, PostbackTemplateAction
 import os
 import json
 import structlog
@@ -38,6 +38,9 @@ def linebot():
                 question = query.split(LEADING_STR_CHINESE)[1]
             elif query.startswith(LEADING_STR_ENG):
                 question = query.split(LEADING_STR_ENG)[1] + 'and answer in English'
+            elif query == 'send notification to administrator':
+                line_bot_api.reply_message(tk, TextSendMessage(text='已傳送訊息給管理員，將有專人與您聯絡'))  # 回傳訊息
+                return 'OK'
             else:
                 return 'OK'
             is_success, msg = faq_bot.ask(question)
@@ -57,9 +60,10 @@ def linebot():
                                     label='Yes',
                                     text='yes',
                                 ),
-                                MessageTemplateAction(
+                                PostbackTemplateAction(
                                     label='No',
-                                    text='no'
+                                    text='no',
+                                    data='send notification to administrator'
                                 )
                             ]
                         )
