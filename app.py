@@ -1,6 +1,6 @@
 from flask import Flask, request
 from linebot import LineBotApi, WebhookHandler
-from linebot.models import TextSendMessage   # 載入 TextSendMessage 模組
+from linebot.models import TextSendMessage, ConfirmTemplate   # 載入 TextSendMessage 模組
 import os
 import json
 from src.faq_bot import FaqBot
@@ -38,7 +38,7 @@ def linebot():
             else:
                 return 'OK'
             msg += f"\nCost: {faq_bot.total_cost:.6f}"
-            text_message = TextSendMessage(text=msg)          # 設定回傳同樣的訊息
+            text_message = ConfirmTemplate(text=msg)          # 設定回傳同樣的訊息
             line_bot_api.reply_message(tk, text_message)       # 回傳訊息
     except Exception as e:
         tk = json_data['events'][0]['replyToken']   # 取得 reply token
