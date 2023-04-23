@@ -45,6 +45,8 @@ def linebot():
         text_message = TextSendMessage(f'黑姑壞了 {e}')  # 設定回傳同樣的訊息
         line_bot_api = LineBotApi(LINE_TOKEN)
         line_bot_api.reply_message(tk, text_message)  # 回傳訊息
+    finally:
+        faq_bot.total_cost = 0
     return 'OK'
 
 
