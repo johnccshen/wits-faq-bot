@@ -31,10 +31,10 @@ def linebot():
         if 'message' not in json_data['events'][0].keys():
             return 'OK'
         for event in json_data['events']:
-            if 'postback' in event.keys():
-                if event['postback']['data'] == 'send notification to administrator':
-                    line_bot_api.reply_message(tk, TextSendMessage(text='已傳送訊息給管理員，將有專人與您聯絡'))  # 回傳訊息
-            if 'message' in event.keys():
+            if event.get('postback'):
+                logger.info(event)
+                line_bot_api.reply_message(tk, TextSendMessage(text=event['postback']['data']))
+            if event.get('message'):
                 if event['message']['type'] == 'text':
                     messages = []
                     query = json_data['events'][0]['message']['text']
