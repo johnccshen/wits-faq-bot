@@ -3,8 +3,10 @@ from linebot import LineBotApi, WebhookHandler
 from linebot.models import TextSendMessage, ConfirmTemplate   # 載入 TextSendMessage 模組
 import os
 import json
+import structlog
 from src.faq_bot import FaqBot
 app = Flask(__name__)
+logger = structlog.getLogger()
 
 
 LINE_TOKEN = os.getenv('LINE_TOKEN')
@@ -19,6 +21,7 @@ faq_bot = FaqBot()
 def linebot():
     body = request.get_data(as_text=True)
     json_data = json.loads(body)
+    logger.info(json_data)
     try:
         line_bot_api = LineBotApi(LINE_TOKEN)
         handler = WebhookHandler(LINE_SECRET_KEY)
