@@ -31,10 +31,12 @@ def linebot():
         if msg_type == 'text':
             query = json_data['events'][0]['message']['text']
             if query.startswith(LEADING_STR_CHINESE):
-                msg = faq_bot.ask(query.split(LEADING_STR_CHINESE)[1], try_answer=True)
+                try_answer = f"{LEADING_STR_CHINESE}.." in query
+                msg = faq_bot.ask(query.split(LEADING_STR_CHINESE)[1], try_answer=try_answer)
             elif query.startswith(LEADING_STR_ENG):
                 question = query.split(LEADING_STR_ENG)[1] + 'and answer in English'
-                msg = faq_bot.ask(question, try_answer=True)
+                try_answer = f"{LEADING_STR_ENG}.." in query
+                msg = faq_bot.ask(question, try_answer=try_answer)
             else:
                 return 'OK'
             msg += f"\nCost: {faq_bot.total_cost:.6f}"
