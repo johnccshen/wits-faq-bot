@@ -37,9 +37,9 @@ def linebot():
             elif query.startswith(LEADING_STR_ENG):
                 question = query.split(LEADING_STR_ENG)[1] + 'and answer in English'
                 msg = faq_bot.ask(question, try_answer=True)
+                msg += f"\nCost: {faq_bot.total_cost:.6f}"
                 text_message = TextSendMessage(text=msg)          # 設定回傳同樣的訊息
                 line_bot_api.reply_message(tk, text_message)       # 回傳訊息
-                line_bot_api.reply_message(tk, TextSendMessage(f"Cost: {faq_bot.total_cost:.6f}"))       # 回傳訊息
     except Exception as e:
         tk = json_data['events'][0]['replyToken']   # 取得 reply token
         text_message = TextSendMessage(f'黑姑壞了 {e}')  # 設定回傳同樣的訊息
