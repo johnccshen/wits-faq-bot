@@ -1,6 +1,6 @@
 from flask import Flask, request
 from linebot import LineBotApi, WebhookHandler
-from linebot.models import TextSendMessage, ConfirmTemplate, MessageTemplateAction   # 載入 TextSendMessage 模組
+from linebot.models import TextSendMessage, ConfirmTemplate, MessageTemplateAction, TemplateSendMessage
 import os
 import json
 import structlog
@@ -32,6 +32,7 @@ def linebot():
             return 'OK'
         msg_type = json_data['events'][0]['message']['type']  # 取得 LINe 收到的訊息類型
         if msg_type == 'text':
+            messages = []
             query = json_data['events'][0]['message']['text']
             if query.startswith(LEADING_STR_CHINESE):
                 question = query.split(LEADING_STR_CHINESE)[1]
@@ -43,22 +44,28 @@ def linebot():
             if not is_success:
                 msg = faq_bot.general_ask(question)
             msg += f"\nOpenAI Cost: {faq_bot.total_cost:.6f}"
-            text_message = TextSendMessage(text=msg)
-            confirm_message = ConfirmTemplate(
-                title='ConfirmTemplate',
-                text='Are you satisfied with the answer?',
-                actions=[
-                    MessageTemplateAction(
-                        label='Yes',
-                        text='yes',
-                    ),
-                    MessageTemplateAction(
-                        label='No',
-                        text='no'
+            messages.append(TextSendMessage(text=msg))
+            if is_success:
+                messages.append(
+                    TemplateSendMessage(
+                        alt_text='Confirm Message',
+                        template=ConfirmTemplate(
+                            title='ConfirmTemplate',
+                            text='Are you satisfied with the answer?',
+                            actions=[
+                                MessageTemplateAction(
+                                    label='Yes',
+                                    text='yes',
+                                ),
+                                MessageTemplateAction(
+                                    label='No',
+                                    text='no'
+                                )
+                            ]
+                        )
                     )
-                ]
-            )
-            line_bot_api.reply_message(tk, [text_message, confirm_message])       # 回傳訊息
+                )
+            line_bot_api.reply_message(tk, messages)       # 回傳訊息
     except Exception as e:
         tk = json_data['events'][0]['replyToken']   # 取得 reply token
         text_message = TextSendMessage(f'黑姑壞了 {e}')  # 設定回傳同樣的訊息
