@@ -60,7 +60,7 @@ def linebot():
                                         data='Thank you for loving the service. 😎'
                                     ),
                                     PostbackTemplateAction(
-                                        label='No, I need further assistance from real human.',
+                                        label='No, help me!',
                                         text='no',
                                         data='Send notification to administrator. Please wait.'
                                     )
