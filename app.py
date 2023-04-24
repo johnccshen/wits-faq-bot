@@ -57,13 +57,13 @@ def linebot():
                                     PostbackTemplateAction(
                                         label='Yes',
                                         text='yes',
-                                        data='Thank you for loving the service. 😎'
+                                        data='Glad you love it. 😎'
                                     ),
                                     PostbackTemplateAction(
                                         label='No, help me!',
                                         text='no',
-                                        data='Send notification to administrator.\n'
-                                             'John will help you in person. Please wait.'
+                                        data='Send notification to the administrator.\n'
+                                             'John will help you in person. Please wait.🙏🏾'
                                     )
                                 ]
                             )
