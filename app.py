@@ -49,7 +49,7 @@ def linebot():
                     messages.append(TextSendMessage(text=msg))
                     messages.append(
                         TemplateSendMessage(
-                            alt_text='Confirm Message',
+                            alt_text='Confirmation Message',    # 後台顯示
                             template=ConfirmTemplate(
                                 title='ConfirmTemplate',
                                 text='Are you satisfied with the answer?',
@@ -60,9 +60,9 @@ def linebot():
                                         data='Thank you for loving the service. 😎'
                                     ),
                                     PostbackTemplateAction(
-                                        label='No',
+                                        label='No, I need further assistance from real human.',
                                         text='no',
-                                        data='Send notification to administrator.'
+                                        data='Send notification to administrator. Please wait.'
                                     )
                                 ]
                             )
