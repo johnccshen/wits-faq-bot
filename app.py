@@ -62,7 +62,8 @@ def linebot():
                                     PostbackTemplateAction(
                                         label='No, help me!',
                                         text='no',
-                                        data='Send notification to administrator. Please wait.'
+                                        data='Send notification to administrator.\n'
+                                             'John will help you in person. Please wait.'
                                     )
                                 ]
                             )
