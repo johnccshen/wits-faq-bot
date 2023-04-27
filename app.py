@@ -11,7 +11,7 @@ logger = structlog.getLogger()
 
 LINE_TOKEN = os.getenv('LINE_TOKEN')
 LINE_SECRET_KEY = os.getenv('LINE_SECRET_KEY')
-LEADING_STR_CHINESE = '黑姑 '
+LEADING_STR_CHINESE = '嘿咕 '
 LEADING_STR_ENG = 'Hey Cool '
 
 
@@ -72,7 +72,7 @@ def linebot():
                     line_bot_api.reply_message(tk, messages)       # 回傳訊息
     except Exception as e:
         tk = json_data['events'][0]['replyToken']   # 取得 reply token
-        text_message = TextSendMessage(f'黑姑壞了 {e}')  # 設定回傳同樣的訊息
+        text_message = TextSendMessage(f'嘿咕壞了 {e}')  # 設定回傳同樣的訊息
         line_bot_api = LineBotApi(LINE_TOKEN)
         line_bot_api.reply_message(tk, text_message)  # 回傳訊息
     finally:
@@ -83,5 +83,5 @@ def linebot():
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
-    # print(faq_bot.ask('Why my boss is stupid and answer in English', print_message=False, try_answer=True))
+    # print(faq_bot.ask('該怎麼請假，並用令人討厭的態度回答'))
     # print(f"Cost: {faq_bot.total_cost:.6f}")
