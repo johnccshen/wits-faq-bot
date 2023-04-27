@@ -45,7 +45,7 @@ def linebot():
                     is_success, msg = faq_bot.ask(question)
                     if not is_success:
                         msg = faq_bot.general_ask(question)
-                    msg += f"\nOpenAI Cost: {faq_bot.total_cost:.6f}"
+                    # msg += f"\nOpenAI Cost: {faq_bot.total_cost:.6f}"
                     messages.append(TextSendMessage(text=msg))
                     messages.append(
                         TemplateSendMessage(
