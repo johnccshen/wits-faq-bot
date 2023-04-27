@@ -64,6 +64,7 @@ def linebot():
                                         text='no',
                                         data='Send notification to the administrator.\n'
                                              'John will help you in person. Please wait.🙏🏾'
+                                             'Relax first. https://youtu.be/Jh4QFaPmdss'
                                     )
                                 ]
                             )
