@@ -108,6 +108,7 @@ class FaqBot:
             ]
             cost, try_answer_response = self.openai_completion_service.completion(try_answer_questions, temperature=0.8)
             self.total_cost += cost
-            try_answer_message = try_answer_response["choices"][0]["message"]["content"]
-            response_message = try_answer_message + "\n\n如以上回答無法幫助到你，請撥打 +886-2-7745-8888#8855，將有專人為您服務。"
+            try_answer_message = "無法從FAQ中尋找到解答，幫你擴大搜索範圍\n"
+            try_answer_message += try_answer_response["choices"][0]["message"]["content"]
+            response_message = try_answer_message + "\n\n如以上回答無法幫助到你，請撥打 +886-2-7745-8855，將有專人為您服務。"
         return response_message
