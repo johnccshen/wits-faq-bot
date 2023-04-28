@@ -60,7 +60,8 @@ def linebot():
                             response_format="text",
                             language="zh"
                         )
-                    question = transcript['text']
+                    logger.info(transcript)
+                    question = transcript
                     question += "，並以中文回答"
                     logger.info(f"Get audio question {question}")
                 else:
