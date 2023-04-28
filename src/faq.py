@@ -1,9 +1,10 @@
 import openai
-import ast  # for converting embeddings saved as strings back to arrays
-import pandas as pd  # for storing text and embeddings data
-from scipy import spatial  # for calculating vector similarities for search
-from . import EMBEDDING_PATH, GPT_MODEL, num_tokens
-from . import GPT_MODEL, EMBEDDING_MODEL, num_tokens
+import ast
+import pandas as pd
+from scipy import spatial
+from . import GPT_MODEL, EMBEDDING_MODEL, num_tokens, EMBEDDING_PATH
+from asyncer import asyncify
+
 
 df_embedding = pd.read_csv(EMBEDDING_PATH)
 # convert embeddings from CSV str type back to list type
@@ -16,7 +17,7 @@ def calculate_cost(query: str, model: str, cost_per_1k_token: float):
 
 
 async def embedding(query: str, model: str = EMBEDDING_MODEL):
-    query_response = await openai.Embedding.create(
+    query_response = await asyncify(openai.Embedding.create)(
         model=model,
         input=query,
     )
@@ -27,7 +28,7 @@ async def completion(messages, temperature: float = 0, model: str = GPT_MODEL):
     message_string = ''
     for line in messages:
         message_string += str(line)
-    query_response = await openai.ChatCompletion.create(
+    query_response = await asyncify(openai.ChatCompletion.create)(
         model=model,
         messages=messages,
         temperature=temperature

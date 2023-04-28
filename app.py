@@ -1,6 +1,6 @@
 from flask import Flask, request
 from linebot import LineBotApi, WebhookHandler
-from linebot.models import TextSendMessage, ConfirmTemplate, MessageTemplateAction, TemplateSendMessage, PostbackTemplateAction
+from linebot.models import TextSendMessage, ConfirmTemplate, TemplateSendMessage, PostbackTemplateAction
 import os
 import json
 import structlog
@@ -16,6 +16,7 @@ LEADING_STR_ENG = 'Hey Cool '
 
 
 faq_bot = FaqBot()
+
 
 @app.route("/lineBot", methods=['POST'])
 def linebot():
