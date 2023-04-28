@@ -8,7 +8,6 @@ from src.faq_bot import FaqBot
 import openai
 app = Flask(__name__)
 logger = structlog.getLogger()
-audio_model = whisper.model("base")
 
 LINE_TOKEN = os.getenv('LINE_TOKEN')
 LINE_SECRET_KEY = os.getenv('LINE_SECRET_KEY')
@@ -106,7 +105,7 @@ def linebot():
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
-    # print(faq_bot.ask('怎麼退便當'))
-    # print(f"Cost: {faq_bot.total_cost:.6f}")
+    # port = int(os.environ.get('PORT', 5000))
+    # app.run(host='0.0.0.0', port=port)
+    print(faq_bot.ask('怎麼退便當'))
+    print(f"Cost: {faq_bot.total_cost:.6f}")
