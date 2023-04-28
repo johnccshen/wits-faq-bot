@@ -105,7 +105,7 @@ def linebot():
 
 
 if __name__ == "__main__":
-    # port = int(os.environ.get('PORT', 5000))
-    # app.run(host='0.0.0.0', port=port)
-    print(faq_bot.ask('怎麼退便當'))
-    print(f"Cost: {faq_bot.total_cost:.6f}")
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
+    # print(faq_bot.ask('怎麼退便當'))
+    # print(f"Cost: {faq_bot.total_cost:.6f}")
