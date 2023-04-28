@@ -6,7 +6,6 @@ import json
 import structlog
 from src.faq_bot import FaqBot
 import openai
-import whisper
 app = Flask(__name__)
 logger = structlog.getLogger()
 audio_model = whisper.model("base")
@@ -55,8 +54,14 @@ def linebot():
                         for chunk in audio_content.iter_content():
                             fd.write(chunk)
                     logger.info(f"Write file to {audio_file}")
-                    result = whisper.transcribe(audio_file, fp16=False)
-                    question = result['text']
+                    with open(audio_file, "rb") as af:
+                        transcript = openai.Audio.transcribe(
+                            file=af,
+                            model="whisper-1",
+                            response_format="text",
+                            language="zh"
+                        )
+                    question = transcript['text']
                     question += "，並以中文回答"
                     logger.info(f"Get audio question {question}")
                 else:
