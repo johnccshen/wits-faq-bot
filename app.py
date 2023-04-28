@@ -55,6 +55,7 @@ def linebot():
                             fd.write(chunk)
                     logger.info(f"Write file to {audio_file}")
                     audio = open(audio_file, 'rb')
+                    logger.info("Start open ai transcribe")
                     resp = openai.Audio.transcribe("whisper-1", audio)
                     body = json.loads(resp)
                     question = body['text']
