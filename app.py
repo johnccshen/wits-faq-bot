@@ -5,6 +5,7 @@ import os
 import json
 import structlog
 from src.faq_bot import FaqBot
+import openai
 app = Flask(__name__)
 logger = structlog.getLogger()
 
@@ -22,20 +23,20 @@ faq_bot = FaqBot()
 def linebot():
     body = request.get_data(as_text=True)
     json_data = json.loads(body)
+    token = json_data['events'][0]['replyToken']  # 取得 reply token
     logger.info(json_data)
     try:
         line_bot_api = LineBotApi(LINE_TOKEN)
         handler = WebhookHandler(LINE_SECRET_KEY)
         signature = request.headers['X-Line-Signature']
         handler.handle(body, signature)
-        tk = json_data['events'][0]['replyToken']   # 取得 reply token
         for event in json_data['events']:
             logger.info(event)
             if event.get('postback'):
-                line_bot_api.reply_message(tk, TextSendMessage(text=event['postback']['data']))
+                line_bot_api.reply_message(token, TextSendMessage(text=event['postback']['data']))
             if event.get('message'):
+                reply_messages = []
                 if event['message']['type'] == 'text':
-                    messages = []
                     query = event['message']['text']
                     if query.startswith(LEADING_STR_CHINESE):
                         question = query.split(LEADING_STR_CHINESE)[1] + '並以中文回答'
@@ -43,40 +44,46 @@ def linebot():
                         question = query.split(LEADING_STR_ENG)[1] + 'and answer in English'
                     else:
                         return 'OK'
-                    is_success, msg = faq_bot.ask(question)
-                    if not is_success:
-                        msg = faq_bot.general_ask(question)
-                    # msg += f"\nOpenAI Cost: {faq_bot.total_cost:.6f}"
-                    messages.append(TextSendMessage(text=msg))
-                    messages.append(
-                        TemplateSendMessage(
-                            alt_text='Confirmation Message',    # 後台顯示
-                            template=ConfirmTemplate(
-                                title='ConfirmTemplate',
-                                text='Are you satisfied with the answer?',
-                                actions=[
-                                    PostbackTemplateAction(
-                                        label='Yes',
-                                        text='yes',
-                                        data='Glad you love it. 😎'
-                                    ),
-                                    PostbackTemplateAction(
-                                        label='No, help me!',
-                                        text='no',
-                                        data='Send notification to the administrator.\n'
-                                             'John will help you in person. Please wait.🙏🏾'
-                                             'Relax first!🥳\nhttps://youtu.be/Jh4QFaPmdss'
-                                    )
-                                ]
-                            )
+                elif event['message']['type'] == 'audio':
+                    event_id = event['message']['id']
+                    audio_content = line_bot_api.get_message_content(event_id)
+                    question = openai.Audio.transcribe("whisper-2", audio_content)
+                else:
+                    return 'OK'
+                is_success, msg = faq_bot.ask(question)
+                # if not is_success:
+                #     msg = faq_bot.general_ask(question)
+                # msg += f"\nOpenAI Cost: {faq_bot.total_cost:.6f}"
+                reply_messages.append(TextSendMessage(text=msg))
+                reply_messages.append(
+                    TemplateSendMessage(
+                        alt_text='Confirmation Message',    # 後台顯示
+                        template=ConfirmTemplate(
+                            title='ConfirmTemplate',
+                            text='Are you satisfied with the answer?',
+                            actions=[
+                                PostbackTemplateAction(
+                                    label='Yes',
+                                    text='yes',
+                                    data='Glad you love it. 😎'
+                                ),
+                                PostbackTemplateAction(
+                                    label='No, help me!',
+                                    text='no',
+                                    data='Send notification to the administrator.\n'
+                                         'John will help you in person. Please wait.🙏🏾'
+                                         'Relax first!🥳\nhttps://youtu.be/Jh4QFaPmdss'
+                                )
+                            ]
                         )
                     )
-                    line_bot_api.reply_message(tk, messages)       # 回傳訊息
+                )
+                line_bot_api.reply_message(token, reply_messages)       # 回傳訊息
     except Exception as e:
-        tk = json_data['events'][0]['replyToken']   # 取得 reply token
+        token = json_data['events'][0]['replyToken']   # 取得 reply token
         text_message = TextSendMessage(f'嘿咕壞了 {e}')  # 設定回傳同樣的訊息
         line_bot_api = LineBotApi(LINE_TOKEN)
-        line_bot_api.reply_message(tk, text_message)  # 回傳訊息
+        line_bot_api.reply_message(token, text_message)  # 回傳訊息
     finally:
         faq_bot.total_cost = 0
     return 'OK'
@@ -85,5 +92,5 @@ def linebot():
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
-    # print(faq_bot.ask('該怎麼請假，並用令人討厭的態度回答'))
+    # print(faq_bot.ask('怎麼退便當'))
     # print(f"Cost: {faq_bot.total_cost:.6f}")
