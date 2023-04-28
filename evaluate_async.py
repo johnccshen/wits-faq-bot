@@ -16,7 +16,7 @@ async def get_answer(question, retry=99):
         try:
             print("= " * 10)
             print(question)
-            status, ans = await ask(question)
+            status, ans = await ask(question, print_message=True)
             print(ans)
             print()
             result = {'question': question, "status": status, 'answer': ans}
@@ -31,10 +31,7 @@ async def get_answer(question, retry=99):
 
 
 async def main():
-    answers = []
-    df_eval = pd.DataFrame(answers)
-    df_eval.to_csv('src/data/async_evaluation.csv', index=False)
-    questions = [row['詢問內容摘要'] for _, row in df.iterrows()]
+    questions = [row['questions'] for _, row in df.iterrows()]
     tasks = [get_answer(question) for question in questions]
     answers = await asyncio.gather(*tasks)
     df_eval = pd.DataFrame(answers)
