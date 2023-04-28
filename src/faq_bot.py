@@ -1,6 +1,5 @@
 import ast  # for converting embeddings saved as strings back to arrays
 import pandas as pd  # for storing text and embeddings data
-import openai
 from scipy import spatial  # for calculating vector similarities for search
 from . import EMBEDDING_PATH, GPT_MODEL, num_tokens
 from src.openai_service import OpenAIEmbeddingService, OpenAICompletionService
@@ -8,19 +7,6 @@ from src.openai_service import OpenAIEmbeddingService, OpenAICompletionService
 df_embedding = pd.read_csv(EMBEDDING_PATH)
 # convert embeddings from CSV str type back to list type
 df_embedding['embedding'] = df_embedding['embedding'].apply(ast.literal_eval)
-
-
-async def completion(self, messages, temperature: float = 0, model: str = GPT_MODEL):
-    message_string = ''
-    for line in messages:
-        message_string += str(line)
-    cost = self.calculate_cost(message_string, model)
-    query_response = await openai.ChatCompletion.create(
-        model=model,
-        messages=messages,
-        temperature=temperature
-    )
-    return cost, query_response
 
 
 class FaqBot:
