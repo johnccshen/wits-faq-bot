@@ -16,7 +16,7 @@ async def get_answer(question, retry=99):
         try:
             print("= " * 10)
             print(question)
-            status, ans = await ask(question, print_message=True)
+            status, ans = await ask(question)
             print(ans)
             print()
             result = {'question': question, "status": status, 'answer': ans}
