@@ -44,10 +44,14 @@ def linebot():
                         question = query.split(LEADING_STR_ENG)[1] + 'and answer in English'
                     else:
                         return 'OK'
+                    logger.info(f"Get text question {question}")
                 elif event['message']['type'] == 'audio':
-                    event_id = event['message']['id']
-                    audio_content = line_bot_api.get_message_content(event_id)
+                    message_id = event['message']['id']
+                    audio_content = line_bot_api.get_message_content(message_id)
+                    # audio_file = f"data/audio/audio-{message_id}.mp3"
+                    logger.info("Successfully get audio content")
                     question = openai.Audio.transcribe("whisper-2", audio_content)
+                    logger.info(f"Get audio question {question}")
                 else:
                     return 'OK'
                 is_success, msg = faq_bot.ask(question)
