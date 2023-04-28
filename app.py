@@ -48,9 +48,14 @@ def linebot():
                 elif event['message']['type'] == 'audio':
                     message_id = event['message']['id']
                     audio_content = line_bot_api.get_message_content(message_id)
-                    # audio_file = f"data/audio/audio-{message_id}.mp3"
-                    logger.info("Successfully get audio content")
-                    question = openai.Audio.transcribe("whisper-2", audio_content)
+                    audio_file = f"data/audio/audio-{message_id}.mp3"
+                    os.makedirs("data/audio", exist_ok=True)
+                    with open(audio_file, 'wb') as fd:
+                        for chunk in audio_content.iter_content():
+                            fd.write(chunk)
+                    logger.info(f"Write file to {audio_file}")
+                    with open(audio_file, 'rb') as af:
+                        question = openai.Audio.transcribe("whisper-2", af)
                     logger.info(f"Get audio question {question}")
                 else:
                     return 'OK'
