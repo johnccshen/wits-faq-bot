@@ -89,12 +89,12 @@ class FaqBot:
         elif 'Sorry it is out of my knowledge. Please contact 8855 for further assistance' in response_message:
             is_succeed = False
         if not is_succeed:
-            recommend_questions, _ = self.strings_ranked_by_relatedness(query, df, top_n=3)
+            recommend_questions, _ = self.strings_ranked_by_relatedness(query, df, top_n=2)
             recommend_strings = "以下為你找尋最接近的FAQ"
             for ind, recommend in enumerate(recommend_questions):
                 recommend_strings += f"\nRecommend Ans {ind+1}:\n{recommend}"
             if "Please contact 8855" in response_message:
-                recommend_strings = "These are the top 3 recommended FAQ"
+                recommend_strings = "These are the top 2 recommended FAQ"
                 response = openai.Completion.create(
                     model="text-davinci-003",
                     prompt=f"Translate this into English:\n\n{recommend_strings}\n\n1.",
