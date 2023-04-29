@@ -90,6 +90,7 @@ class FaqBot:
             recommend_strings = ""
             for ind, recommend in enumerate(recommend_questions):
                 recommend_strings += f"\nRecommend Ans {ind}:\n{recommend}\n\n"
+            response_message += recommend_strings
         return is_succeed, response_message
 
     def general_ask(self, query):
