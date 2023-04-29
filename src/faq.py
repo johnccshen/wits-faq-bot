@@ -255,7 +255,7 @@ class FaqAnswerBot:
         self.logger.info('Start to detect language')
         lang = translator.detect(self.question)
         self.logger.info(language_short_name_dict[lang.lang])
-        return language_short_name_dict[lang.lang]
+        return language_short_name_dict.get(lang.lang, "chinese")
 
     @staticmethod
     def strings_ranked_by_relatedness(
