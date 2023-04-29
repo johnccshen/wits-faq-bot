@@ -37,7 +37,14 @@ def linebot():
             if event.get('message'):
                 reply_messages = []
                 if event['message']['type'] == 'text':
-                    question = event['message']['text']
+                    text = event['message']['text']
+                    query = text.lower()
+                    if query.startswith(LEADING_STR_CHINESE):
+                        question = query.split(LEADING_STR_CHINESE)[1] + '並以中文回答'
+                    elif query.startswith(LEADING_STR_ENG):
+                        question = query.split(LEADING_STR_ENG)[1] + 'and answer in English'
+                    else:
+                        return 'OK'
                     logger.info(f"Get text question {question}")
                 elif event['message']['type'] == 'audio':
                     message_id = event['message']['id']
