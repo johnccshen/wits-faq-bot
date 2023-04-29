@@ -254,7 +254,7 @@ class FaqAnswerBot:
         translator = Translator()
         self.logger.info('Start to detect language')
         lang = translator.detect(self.question)
-        self.logger.info(language_short_name_dict[lang.lang])
+        self.logger.info(language_short_name_dict.get(lang.lang, "chinese"))
         return language_short_name_dict.get(lang.lang, "chinese")
 
     @staticmethod
