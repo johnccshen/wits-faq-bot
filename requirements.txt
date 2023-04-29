@@ -15,7 +15,6 @@ pandas
 pip-chill
 polyglot
 pycld2
-pyicu
 pyopenssl
 pysocks
 pyttsx3
