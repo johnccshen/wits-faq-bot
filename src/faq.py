@@ -302,7 +302,7 @@ class FaqAnswerBot:
             model: str = GPT_MODEL,
             token_budget: int = 4096 - 500,
             print_message: bool = False,
-            recommend_question_cnt=2
+            recommend_question_cnt=3
     ) -> (bool, str):
         """Answers a query using GPT and a dataframe of relevant texts and embeddings."""
         is_succeed = True
@@ -322,7 +322,7 @@ class FaqAnswerBot:
             recommend_strings = "\nThese are the recommended FAQ"
         try:
             for ind, recommend in enumerate(self.top_n_recommended[:recommend_question_cnt]):
-                question = recommend.split('\n')[0].split("Question:")[1]
+                question = recommend.split('\n')[0]
                 ans = recommend.split('\n')[1]
                 self.logger.info(f"About to translate {question}")
                 transcribed_question = translate(question,
@@ -336,31 +336,3 @@ class FaqAnswerBot:
         response_message += recommend_strings
         return is_succeed, response_message
 
-    # def general_ask(self, query):
-    #     if 'answer in english' in query:
-    #         try_answer_questions = [
-    #             {"role": "system", "content": "'The following is a conversation with an AI assistant. "
-    #                                           "The assistant is helpful, creative, clever, and very friendly.'"},
-    #             {"role": "system", "content": "How can I help you"},
-    #             {"role": "user", "content": query},
-    #         ]
-    #         cost, try_answer_response = self.openai_completion_service.completion_async(try_answer_questions,
-    #                                                                                     temperature=0.8,
-    #                                                                                     model='text-davinci-003')
-    #         self.total_cost += cost
-    #         try_answer_message = try_answer_response["choices"][0]["message"]["content"]
-    #         response_message = try_answer_message + \
-    #                            "\n\nIf the above answer can't help you, please contact +886-2-7745-8888#8855 for further assistance."
-    #     else:
-    #         try_answer_questions = [
-    #             {"role": "system", "content": "以下是一個和AI助理的對話，這個助理非常的有同理心、有創造力並非常友善"},
-    #             {"role": "system", "content": "請問我能如何協助你？"},
-    #             {"role": "user", "content": query},
-    #         ]
-    #         cost, try_answer_response = self.openai_completion_service.completion_async(try_answer_questions,
-    #                                                                                     temperature=0.8)
-    #         self.total_cost += cost
-    #         try_answer_message = "無法從FAQ中尋找到解答，幫你擴大搜索範圍\n"
-    #         try_answer_message += try_answer_response["choices"][0]["message"]["content"]
-    #         response_message = try_answer_message + "\n\n如以上回答無法幫助到你，請撥打 +886-2-7745-8855，將有專人為您服務。"
-    #     return response_message
