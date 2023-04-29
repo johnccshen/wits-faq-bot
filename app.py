@@ -1,6 +1,6 @@
 from flask import Flask, request
 from linebot import LineBotApi, WebhookHandler
-from linebot.models import TextSendMessage, ConfirmTemplate, TemplateSendMessage, PostbackTemplateAction
+from linebot.models import TextSendMessage, ConfirmTemplate, TemplateSendMessage, PostbackTemplateAction, AudioMessage
 import os
 import json
 import structlog
