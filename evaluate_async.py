@@ -1,14 +1,14 @@
 import asyncio
 import timeit
 import pandas as pd
-from src.faq import ask
-from src import GPT_MODEL
+from src.faq_async import ask
 
 
 excel_path = "src/data/2023-qa.xlsx"
 df = pd.read_excel(excel_path)
-
 model = 'text-davinci-003'
+
+
 async def get_answer(question, retry=99):
     status = True
     retry_cnt = 0

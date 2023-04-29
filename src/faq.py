@@ -1,130 +1,183 @@
-import openai
 import ast
+import structlog
 import pandas as pd
 from scipy import spatial
-from . import GPT_MODEL, EMBEDDING_MODEL, num_tokens, EMBEDDING_PATH
-from asyncer import asyncify
+from . import EMBEDDING_PATH, GPT_MODEL, EMBEDDING_MODEL
+import openai
+import tiktoken
+from polyglot.detect import Detector
 
 
-df_embedding = pd.read_csv(EMBEDDING_PATH)
-# convert embeddings from CSV str type back to list type
-df_embedding['embedding'] = df_embedding['embedding'].apply(ast.literal_eval)
+def num_tokens(text: str, model: str) -> int:
+    """Return the number of tokens in a string."""
+    encoding = tiktoken.encoding_for_model(model)
+    return len(encoding.encode(text))
 
 
-def calculate_cost(query: str, model: str, cost_per_1k_token: float):
+def calculate_cost(self, query: str, model: str):
     token = num_tokens(query, model)
-    return cost_per_1k_token * token / 1000
+    return self.cost_per_1k_token * token / 1000
 
 
-async def embedding(query: str, model: str = EMBEDDING_MODEL):
-    query_response = await asyncify(openai.Embedding.create)(
+def embedding(query, model: str = EMBEDDING_MODEL):
+    return openai.Embedding.create(
         model=model,
         input=query,
     )
-    return query_response
 
 
-async def completion(messages, temperature: float = 0, model: str = GPT_MODEL):
-    message_string = ''
-    for line in messages:
-        message_string += str(line)
-    query_response = await asyncify(openai.ChatCompletion.create)(
+def completion(messages, temperature: float = 0, model: str = GPT_MODEL):
+    return openai.ChatCompletion.create(
         model=model,
         messages=messages,
         temperature=temperature
     )
-    return query_response
 
 
-async def strings_ranked_by_relatedness(
-        query: str,
-        df: pd.DataFrame,
-        relatedness_fn=lambda x, y: 1 - spatial.distance.cosine(x, y),
-        top_n: int = 50
-) -> tuple[list[str], list[float]]:
-    """Returns a list of strings and relatednesses, sorted from most related to least."""
-    query_embedding_response = await embedding(query)
-    query_embedding = query_embedding_response["data"][0]["embedding"]
-    strings_and_relatednesses = [
-        (row["text"], relatedness_fn(query_embedding, row["embedding"]))
-        for i, row in df.iterrows()
-    ]
-    strings_and_relatednesses.sort(key=lambda x: x[1], reverse=True)
-    strings, relatednesses = zip(*strings_and_relatednesses)
-    return strings[:top_n], relatednesses[:top_n]
+def translate(message, language, model="text-davinci-003"):
+    prompt = f"Translate {message} into {language}:\n\n"
+    response = openai.Completion.create(
+        model=model,
+        prompt=prompt,
+        temperature=1,
+        max_tokens=4097,
+        top_p=0.2,
+        frequency_penalty=0.0,
+        presence_penalty=0.0
+    )
+    return response["choices"][0]["text"]
 
 
-async def query_message(
-        query: str,
-        df: pd.DataFrame,
-        model: str,
-        token_budget: int
-) -> str:
-    """Return a message for GPT, with relevant source texts pulled from a dataframe."""
-    strings, relatednesses = await strings_ranked_by_relatedness(query, df)
-    introduction = 'The following is a conversation with an AI assistant. ' \
-                   'The assistant is helpful, creative, clever, and very friendly.' \
-                   '運用以下的FAQ來回答問題，並附上聯絡人資訊。' \
-                   '如果無法利用FAQ來回答問題，請回答：(很抱歉，我無法回答以上問題，請聯絡8855。\n' \
-                   'Sorry it is out of my knowledge. Please contact 8855 for further assistance)'
-    question = f"\n\nQuestion: {query}"
-    message = introduction
-    for string in strings:
-        next_article = f'\n\nFAQ:\n"""\n{string}\n"""'
-        if (
-                num_tokens(message + next_article + question, model=model)
-                > token_budget
-        ):
-            break
+
+class FaqAnswerBot:
+    def __init__(self, text, top_n=15):
+        self.logger = structlog.getLogger()
+        self.question = text
+        self.language = self.detect_text_language()
+        self.embedding_df = pd.read_csv(EMBEDDING_PATH)
+        self.embedding_df['embedding'] = self.embedding_df['embedding'].apply(ast.literal_eval)
+        self.top_n_recommended, self.top_n_relatatednesses = self.strings_ranked_by_relatedness(
+            text, self.embedding_df, top_n=top_n
+        )
+        self.feedback = "很抱歉，我無法回答以上問題，請聯絡02-7745-8855，將有專人為您服務。" \
+            if self.language == "Chinese" else "Sorry it is out of my knowledge. Please contact 02-7745-8855 for further assistance"
+
+    def detect_text_language(self):
+        language_cnt = {}
+        for language in Detector(self.question).languages:
+            if language.name not in language_cnt:
+                language_cnt[language.name] = 0
+            else:
+                language_cnt[language.name] += 1
+        max_value = sorted([v for v in language_cnt.values()])[0]
+        invert_language_cnt = {v: k for k, v in language_cnt.items()}
+        self.logger.info(invert_language_cnt[max_value])
+        return invert_language_cnt[max_value]
+
+    @staticmethod
+    def strings_ranked_by_relatedness(
+            query: str,
+            df: pd.DataFrame,
+            relatedness_fn=lambda x, y: 1 - spatial.distance.cosine(x, y),
+            top_n: int = 15
+    ) -> tuple[list[str], list[float]]:
+        """Returns a list of strings and relatednesses, sorted from most related to least."""
+        query_embedding_response = embedding(query)
+        query_embedding = query_embedding_response["data"][0]["embedding"]
+        strings_and_relatednesses = [
+            (row["text"], relatedness_fn(query_embedding, row["embedding"]))
+            for i, row in df.iterrows()
+        ]
+        strings_and_relatednesses.sort(key=lambda x: x[1], reverse=True)
+        strings, relatednesses = zip(*strings_and_relatednesses)
+        return strings[:top_n], relatednesses[:top_n]
+
+    def query_message(
+            self,
+            query: str,
+            model: str,
+            token_budget: int
+    ) -> str:
+        """Return a message for GPT, with relevant source texts pulled from a dataframe."""
+
+        introduction = f'The following is a conversation with an AI assistant. ' \
+                       f'The assistant is helpful, creative, clever, and very friendly.' \
+                       f'運用以下的FAQ來回答問題，並附上聯絡人資訊。' \
+                       f'如果無法利用FAQ來回答問題，請回答：{self.feedback}\n)'
+        question = f"\n\nQuestion: {query}"
+        message = introduction
+        for string, relatatedness in zip(self.top_n_recommended, self.top_n_relatatednesses):
+            next_article = f'\n\nFAQ:\n"""\n{string}\n"""'
+            if num_tokens(message + next_article + question, model=model)>token_budget:
+                break
+            else:
+                message += next_article
+        return message + question
+
+    def answer(
+            self,
+            model: str = GPT_MODEL,
+            token_budget: int = 4096 - 500,
+            print_message: bool = False,
+            recommend_question_cnt = 2
+    ) -> (bool, str):
+        """Answers a query using GPT and a dataframe of relevant texts and embeddings."""
+        is_succeed = True
+        message = self.query_message(query=self.question, model=model, token_budget=token_budget)
+        if print_message:
+            print(message)
+        messages = [
+            {"role": "system", "content": "回答有關FAQ的問題"},
+            {"role": "user", "content": message},
+        ]
+        response = completion(messages)
+        response_message = response["choices"][0]["message"]["content"]
+        if self.feedback in response_message:
+            is_succeed = False
+        if is_succeed:
+            recommend_strings = "\nThese are referencing FAQ"
         else:
-            message += next_article
-    return message + question
+            recommend_strings = "\nThese are the recommended FAQ"
+        try:
+            for ind, recommend in enumerate(self.top_n_recommended[:recommend_question_cnt]):
+                question = recommend.split('\n')[0].split("Question:")[1]
+                ans = recommend.split('\n')[1]
+                self.logger.info(f"About to translate {question}")
+                transcribed_question = translate(question, language=self.language) if self.language != "Chinese" else question
+                self.logger.info(f"About to translate {ans}")
+                transcribed_ans = translate(ans, language=self.language) if self.language != "Chinese" else ans
+                recommend_strings += f"\nRecommend Ans {ind+1}:\n{transcribed_question}\n{transcribed_ans}"
+        except Exception as e:
+            self.logger.error(e)
+            recommend_strings = ""
+        response_message += recommend_strings
+        return is_succeed, response_message
 
-
-async def ask(
-        query: str,
-        df: pd.DataFrame = df_embedding,
-        model: str = GPT_MODEL,
-        token_budget: int = 4096 - 500,
-        print_message: bool = False,
-) -> (bool, str):
-    """Answers a query using GPT and a dataframe of relevant texts and embeddings."""
-    is_succeed = True
-    message = await query_message(query, df, model=model, token_budget=token_budget)
-    if print_message:
-        print(message)
-    messages = [
-        {"role": "system", "content": "回答有關FAQ的問題"},
-        {"role": "user", "content": message},
-    ]
-    response = await completion(messages)
-    response_message = response["choices"][0]["message"]["content"]
-    if '很抱歉，我無法回答以上問題，請聯絡8855。' in response_message:
-        is_succeed = False
-    elif 'Sorry it is out of my knowledge. Please contact 8855 for further assistance' in response_message:
-        is_succeed = False
-    return is_succeed, response_message
-
-
-async def general_ask(query):
-    if 'answer in english' in query:
-        try_answer_questions = [
-            {"role": "system", "content": "'The following is a conversation with an AI assistant. "
-                                          "The assistant is helpful, creative, clever, and very friendly.'"},
-            {"role": "system", "content": "How can I help you"},
-            {"role": "user", "content": query},
-        ]
-        try_answer_response = await completion(try_answer_questions, temperature=0.8)
-        try_answer_message = try_answer_response["choices"][0]["message"]["content"]
-        response_message = try_answer_message + \
-                           "\n\nIf the above answer can't help you, please contact +886-2-7745-8888#8855 for further assistance."
-    else:
-        try_answer_questions = [
-            {"role": "system", "content": "以下是一個和AI助理的對話，這個助理非常的有同理心、有創造力並非常友善"},
-            {"role": "system", "content": "請問我能如何協助你？"},
-            {"role": "user", "content": query},
-        ]
-        cost, try_answer_response =await completion(try_answer_questions, temperature=0.8)
-        try_answer_message = try_answer_response["choices"][0]["message"]["content"]
-        response_message = try_answer_message + "\n\n如以上回答無法幫助到你，請撥打 +886-2-7745-8888#8855，將有專人為您服務。"
-    return response_message
+    # def general_ask(self, query):
+    #     if 'answer in english' in query:
+    #         try_answer_questions = [
+    #             {"role": "system", "content": "'The following is a conversation with an AI assistant. "
+    #                                           "The assistant is helpful, creative, clever, and very friendly.'"},
+    #             {"role": "system", "content": "How can I help you"},
+    #             {"role": "user", "content": query},
+    #         ]
+    #         cost, try_answer_response = self.openai_completion_service.completion_async(try_answer_questions,
+    #                                                                                     temperature=0.8,
+    #                                                                                     model='text-davinci-003')
+    #         self.total_cost += cost
+    #         try_answer_message = try_answer_response["choices"][0]["message"]["content"]
+    #         response_message = try_answer_message + \
+    #                            "\n\nIf the above answer can't help you, please contact +886-2-7745-8888#8855 for further assistance."
+    #     else:
+    #         try_answer_questions = [
+    #             {"role": "system", "content": "以下是一個和AI助理的對話，這個助理非常的有同理心、有創造力並非常友善"},
+    #             {"role": "system", "content": "請問我能如何協助你？"},
+    #             {"role": "user", "content": query},
+    #         ]
+    #         cost, try_answer_response = self.openai_completion_service.completion_async(try_answer_questions,
+    #                                                                                     temperature=0.8)
+    #         self.total_cost += cost
+    #         try_answer_message = "無法從FAQ中尋找到解答，幫你擴大搜索範圍\n"
+    #         try_answer_message += try_answer_response["choices"][0]["message"]["content"]
+    #         response_message = try_answer_message + "\n\n如以上回答無法幫助到你，請撥打 +886-2-7745-8855，將有專人為您服務。"
+    #     return response_message
