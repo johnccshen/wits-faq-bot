@@ -287,7 +287,7 @@ class FaqAnswerBot:
                        f'The assistant is helpful, creative, clever, and very friendly.' \
                        f'運用以下的FAQ來回答問題，並附上聯絡人資訊。' \
                        f'如果無法利用FAQ來回答問題，請回答：{self.feedback}\n)'
-        question = f"\n\nQuestion: {query}"
+        question = f"\n\nQuestion: {query} and reply in {self.language}"
         message = introduction
         for string, relatatedness in zip(self.top_n_recommended, self.top_n_relatatednesses):
             next_article = f'\n\nFAQ:\n"""\n{string}\n"""'
