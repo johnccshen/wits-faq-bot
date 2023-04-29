@@ -48,6 +48,7 @@ def linebot():
             logger.info(event)
             if event.get('postback'):
                 line_bot_api.reply_message(token, TextSendMessage(text=event['postback']['data']))
+                return 'OK'
             if event.get('message'):
                 reply_messages = []
                 if event['message']['type'] == 'text':
