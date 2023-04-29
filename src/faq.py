@@ -323,13 +323,14 @@ class FaqAnswerBot:
         recommend_strings = ""
         try:
             for ind, recommend in enumerate(self.top_n_recommended[:recommend_question_cnt]):
+                if self.top_n_relatatednesses[ind] < 0.79:
+                    self.logger.info(f"Skip {recommend}, relatedness is too low")
+                    continue
                 if ind == 0:
                     recommend_strings += f"\n\n{placeholder} FAQs:"
                 self.logger.info(recommend)
                 self.logger.info(self.top_n_relatatednesses[ind])
-                if self.top_n_relatatednesses[ind] < 0.79:
-                    self.logger.info(f"Skip {recommend}, relatedness is too low")
-                    continue
+
                 qa = recommend.split("\nContact")[0]
                 ans = qa.split("\nAnswer: ")[1]
                 question = qa.split('Question: ')[1].split("\nAnswer: ")[0]
