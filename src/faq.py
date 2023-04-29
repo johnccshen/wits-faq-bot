@@ -317,9 +317,9 @@ class FaqAnswerBot:
         response = completion(messages)
         response_message = response["choices"][0]["message"]["content"]
         if self.feedback not in response_message:
-            recommend_strings = "\nThese are referencing FAQ"
+            recommend_strings = "\n\nThese are referencing FAQ"
         else:
-            recommend_strings = "\nThese are the recommended FAQ"
+            recommend_strings = "\n\nThese are the recommended FAQ"
         try:
             for ind, recommend in enumerate(self.top_n_recommended[:recommend_question_cnt]):
                 question = recommend.split('\n')[0]
@@ -329,7 +329,7 @@ class FaqAnswerBot:
                                                  language=self.language) if self.language != "Chinese" else question
                 self.logger.info(f"About to translate {ans}")
                 transcribed_ans = translate(ans, language=self.language) if self.language != "Chinese" else ans
-                recommend_strings += f"\nRecommend Ans {ind + 1}:\n{transcribed_question}\n{transcribed_ans}"
+                recommend_strings += f"\n\nRecommend Ans {ind + 1}:\n{transcribed_question}\n{transcribed_ans}"
         except Exception as e:
             self.logger.error(e)
             recommend_strings = ""
