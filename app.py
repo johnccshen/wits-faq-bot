@@ -5,7 +5,7 @@ import os
 import json
 import structlog
 from src.faq_bot import FaqBot
-from src.audio import generate_audio_and_upload
+from audio import generate_audio_and_upload
 import openai
 app = Flask(__name__)
 logger = structlog.getLogger()
