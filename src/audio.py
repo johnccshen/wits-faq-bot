@@ -38,6 +38,8 @@ def text_to_speech(text, event_id):
 
 
 def generate_audio_and_upload(text, event_id):
+    logger.info('starting starting covert text to speech')
     audio_file = text_to_speech(text, event_id)
+    logger.info("upload file to google drive")
     url = upload_to_gdrive(audio_file)
     return url
