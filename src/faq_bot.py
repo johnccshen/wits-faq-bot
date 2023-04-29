@@ -99,7 +99,7 @@ class FaqBot:
                     model="text-davinci-003",
                     prompt=f"Translate this into English:\n\n{recommend_strings}\n\n1.",
                     temperature=1,
-                    max_tokens=5000,
+                    max_tokens=4097,
                     top_p=1.0,
                     frequency_penalty=0.0,
                     presence_penalty=0.0
