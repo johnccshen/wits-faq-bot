@@ -58,11 +58,10 @@ def linebot():
                     transcribed_msg = f"Get audio question: {question}"
                     logger.info(transcribed_msg)
                     reply_messages.append(TextSendMessage(transcribed_msg))
-                    reply_messages.append(AudioMessage(original_content_url=generate_audio_and_upload(
-                        transcribed_msg,
-                        message_id))
-                    )
-
+                    # reply_messages.append(AudioMessage(original_content_url=generate_audio_and_upload(
+                    #     transcribed_msg,
+                    #     message_id))
+                    # )
                 else:
                     return 'OK'
                 is_success, msg = faq_bot.ask(question)
