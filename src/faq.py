@@ -324,6 +324,7 @@ class FaqAnswerBot:
         try:
             for ind, recommend in enumerate(self.top_n_recommended[:recommend_question_cnt]):
                 self.logger.info(recommend)
+                self.logger.info(self.top_n_relatatednesses[ind])
                 qa = recommend.split("\nContact")[0]
                 ans = qa.split("\nAnswer: ")[1]
                 question = qa.split('Question: ')[1].split("\nAnswer: ")[0]
