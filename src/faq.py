@@ -224,15 +224,15 @@ def completion(messages, temperature: float = 0, model: str = GPT_MODEL):
 
 
 def translate(message, language, model="text-davinci-003"):
-    prompt = f"Translate {message} into {language}:\n\n"
+    prompt = f"Translate this into 1. {language}:\n\n{message}?\n\n1."
     response = openai.Completion.create(
         model=model,
         prompt=prompt,
-        temperature=1,
-        max_tokens=4097,
-        top_p=0.2,
+        temperature=0.8,
+        max_tokens=100,
+        top_p=1.0,
         frequency_penalty=0.0,
-        presence_penalty=0.0
+        presence_penalty=0.0,
     )
     return response["choices"][0]["text"]
 
