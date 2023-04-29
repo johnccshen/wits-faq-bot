@@ -85,6 +85,11 @@ class FaqBot:
             is_succeed = False
         elif 'Sorry it is out of my knowledge. Please contact 8855 for further assistance' in response_message:
             is_succeed = False
+        if not is_succeed:
+            recommend_questions, _ = self.strings_ranked_by_relatedness(query, df, top_n=3)
+            recommend_strings = ""
+            for ind, recommend in enumerate(recommend_questions):
+                recommend_strings += f"\nRecommend Ans {ind}:\n{recommend}\n\n"
         return is_succeed, response_message
 
     def general_ask(self, query):
