@@ -323,6 +323,7 @@ class FaqAnswerBot:
         recommend_strings = f"\n\n{placeholder} FAQs:"
         try:
             for ind, recommend in enumerate(self.top_n_recommended[:recommend_question_cnt]):
+                self.logger.info(recommend)
                 ans = recommend.split('Answers:')[1].split("Contacts:")[0]
                 question = ans.split('Questions:')[1]
                 self.logger.info(f"About to translate {question}")
