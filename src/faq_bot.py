@@ -1,4 +1,6 @@
 import ast  # for converting embeddings saved as strings back to arrays
+
+import openai
 import pandas as pd  # for storing text and embeddings data
 from scipy import spatial  # for calculating vector similarities for search
 from . import EMBEDDING_PATH, GPT_MODEL, num_tokens
@@ -90,6 +92,17 @@ class FaqBot:
             recommend_strings = "以下為你找尋最接近的FAQ"
             for ind, recommend in enumerate(recommend_questions):
                 recommend_strings += f"\nRecommend Ans {ind+1}:\n{recommend}"
+            if "Please contact 8855" in response_message:
+                response = openai.Completion.create(
+                    model="text-davinci-003",
+                    prompt=f"Translate this into English:\n\n{recommend_strings}\n\n1.",
+                    temperature=0.3,
+                    max_tokens=100,
+                    top_p=1.0,
+                    frequency_penalty=0.0,
+                    presence_penalty=0.0
+                )
+                recommend_strings = response
             response_message += recommend_strings
         return is_succeed, response_message
 
