@@ -103,7 +103,7 @@ class FaqBot:
                     frequency_penalty=0.0,
                     presence_penalty=0.0
                 )
-                logger.info(response)
+                recommend_strings = response["choices"][0]["text"]
             response_message += recommend_strings
         return is_succeed, response_message
 
