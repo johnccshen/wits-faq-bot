@@ -11,8 +11,8 @@ logger = structlog.getLogger()
 
 LINE_TOKEN = os.getenv('LINE_TOKEN')
 LINE_SECRET_KEY = os.getenv('LINE_SECRET_KEY')
-LEADING_STR_CHINESE = '嘿咕 '
-LEADING_STR_ENG = 'Hey Cool '
+LEADING_STR_CHINESE = '嘿咕'
+LEADING_STR_ENG = 'Hey Cool'
 
 
 faq_bot = FaqBot()
