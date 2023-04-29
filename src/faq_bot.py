@@ -1,5 +1,5 @@
 import ast  # for converting embeddings saved as strings back to arrays
-
+import structlog
 import openai
 import pandas as pd  # for storing text and embeddings data
 from scipy import spatial  # for calculating vector similarities for search
@@ -9,6 +9,7 @@ from src.openai_service import OpenAIEmbeddingService, OpenAICompletionService
 df_embedding = pd.read_csv(EMBEDDING_PATH)
 # convert embeddings from CSV str type back to list type
 df_embedding['embedding'] = df_embedding['embedding'].apply(ast.literal_eval)
+logger = structlog.getLogger()
 
 
 class FaqBot:
@@ -102,7 +103,7 @@ class FaqBot:
                     frequency_penalty=0.0,
                     presence_penalty=0.0
                 )
-                recommend_strings = response["choices"][0]["message"]["content"]
+                logger.info(response)
             response_message += recommend_strings
         return is_succeed, response_message
 
