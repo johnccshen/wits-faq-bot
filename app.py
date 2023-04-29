@@ -5,6 +5,7 @@ import os
 import json
 import structlog
 from src.faq_bot import FaqBot
+from src.audio import generate_audio_and_upload
 import openai
 app = Flask(__name__)
 logger = structlog.getLogger()
@@ -64,6 +65,10 @@ def linebot():
                     transcribed_msg = f"Get audio question: {question}"
                     logger.info(transcribed_msg)
                     reply_messages.append(TextSendMessage(transcribed_msg))
+                    reply_messages.append(AudioMessage(original_content_url=generate_audio_and_upload(
+                        generate_audio_and_upload,
+                        message_id))
+                    )
 
                 else:
                     return 'OK'
