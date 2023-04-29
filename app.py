@@ -12,7 +12,7 @@ logger = structlog.getLogger()
 LINE_TOKEN = os.getenv('LINE_TOKEN')
 LINE_SECRET_KEY = os.getenv('LINE_SECRET_KEY')
 LEADING_STR_CHINESE = '嘿咕'
-LEADING_STR_ENG = 'Hey Cool'
+LEADING_STR_ENG = 'hey cool'
 
 
 faq_bot = FaqBot()
@@ -36,7 +36,8 @@ def linebot():
             if event.get('message'):
                 reply_messages = []
                 if event['message']['type'] == 'text':
-                    query = event['message']['text']
+                    text = event['message']['text']
+                    query = text.lower()
                     if query.startswith(LEADING_STR_CHINESE):
                         question = query.split(LEADING_STR_CHINESE)[1] + '並以中文回答'
                     elif query.startswith(LEADING_STR_ENG):
