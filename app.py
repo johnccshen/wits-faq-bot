@@ -37,8 +37,7 @@ def linebot():
             if event.get('message'):
                 reply_messages = []
                 if event['message']['type'] == 'text':
-                    text = event['message']['text']
-                    query = text.lower()
+                    query = event['message']['text']
                     if query.startswith(LEADING_STR_CHINESE):
                         question = query.split(LEADING_STR_CHINESE)[1] + '並以中文回答'
                     elif query.startswith(LEADING_STR_ENG):
