@@ -35,7 +35,7 @@ async def main():
     tasks = [get_answer(question) for question in questions]
     answers = await asyncio.gather(*tasks)
     df_eval = pd.DataFrame(answers)
-    df_eval.to_csv(f'src/data/{GPT_MODEL}_async_evaluation.csv', index=False)
+    df_eval.to_excel(f'src/data/{GPT_MODEL}_async_evaluation.xlsx', index=False)
 
 
 if __name__ == "__main__":
