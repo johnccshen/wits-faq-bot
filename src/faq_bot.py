@@ -95,7 +95,7 @@ class FaqBot:
                 {"role": "system", "content": "How can I help you"},
                 {"role": "user", "content": query},
             ]
-            cost, try_answer_response = self.openai_completion_service.completion(try_answer_questions, temperature=0.8)
+            cost, try_answer_response = self.openai_completion_service.completion(try_answer_questions, temperature=0.8, model='text-davinci-003')
             self.total_cost += cost
             try_answer_message = try_answer_response["choices"][0]["message"]["content"]
             response_message = try_answer_message + \
