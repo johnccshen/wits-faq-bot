@@ -60,7 +60,6 @@ def linebot():
                     line_bot_api.reply_message(token, TextSendMessage(transcribed_msg))
                 else:
                     return 'OK'
-                line_bot_api.reply_message(token, TextSendMessage("Processing...🤪"))
                 faq_answer_bot = FaqAnswerBot(question)
                 is_success, msg = faq_answer_bot.answer()
                 reply_messages.append(TextSendMessage(text=msg))
