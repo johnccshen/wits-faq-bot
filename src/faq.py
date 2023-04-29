@@ -320,9 +320,11 @@ class FaqAnswerBot:
             placeholder = "Reference"
         else:
             placeholder = "Recommended"
-        recommend_strings = f"\n\n{placeholder} FAQs:"
+        recommend_strings = ""
         try:
             for ind, recommend in enumerate(self.top_n_recommended[:recommend_question_cnt]):
+                if ind == 0:
+                    recommend_strings += f"\n\n{placeholder} FAQs:"
                 self.logger.info(recommend)
                 self.logger.info(self.top_n_relatatednesses[ind])
                 if self.top_n_relatatednesses[ind] < 0.79:
