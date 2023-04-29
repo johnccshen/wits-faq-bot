@@ -37,13 +37,7 @@ def linebot():
             if event.get('message'):
                 reply_messages = []
                 if event['message']['type'] == 'text':
-                    query = event['message']['text']
-                    if query.startswith(LEADING_STR_CHINESE):
-                        question = query.split(LEADING_STR_CHINESE)[1] + '並以中文回答'
-                    elif query.startswith(LEADING_STR_ENG):
-                        question = query.split(LEADING_STR_ENG)[1] + 'and answer in English'
-                    else:
-                        question = query
+                    question = event['message']['text']
                     logger.info(f"Get text question {question}")
                 elif event['message']['type'] == 'audio':
                     message_id = event['message']['id']
@@ -113,5 +107,5 @@ def linebot():
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
-    # print(faq_bot.ask('How can I apply for a day off'))
+    # print(faq_bot.ask('我明天要請個人假'))
     # print(f"Cost: {faq_bot.total_cost:.6f}")
