@@ -60,7 +60,10 @@ def linebot():
                             response_format="text",
                             language="zh"
                         )
-                    logger.info(f"Get audio question {question}")
+                    transcribed_msg = f"Get audio question: {question}"
+                    logger.info(transcribed_msg)
+                    reply_messages.append(TextSendMessage(transcribed_msg))
+
                 else:
                     return 'OK'
                 is_success, msg = faq_bot.ask(question)
