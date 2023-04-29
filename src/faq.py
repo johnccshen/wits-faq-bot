@@ -254,8 +254,8 @@ class FaqAnswerBot:
         translator = Translator()
         self.logger.info('Start to detect language')
         lang = translator.detect(self.question)
-        self.logger.info(language_short_name_dict.get(lang.lang, "chinese"))
-        return language_short_name_dict.get(lang.lang, "chinese")
+        self.logger.info(language_short_name_dict.get(lang.lang, "Chinese"))
+        return language_short_name_dict.get(lang.lang, "Chinese")
 
     @staticmethod
     def strings_ranked_by_relatedness(
@@ -316,9 +316,7 @@ class FaqAnswerBot:
         self.logger.info("Getting response from openai")
         response = completion(messages)
         response_message = response["choices"][0]["message"]["content"]
-        if self.feedback in response_message:
-            is_succeed = False
-        if is_succeed:
+        if self.feedback not in response_message:
             recommend_strings = "\nThese are referencing FAQ"
         else:
             recommend_strings = "\nThese are the recommended FAQ"
