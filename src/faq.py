@@ -323,8 +323,8 @@ class FaqAnswerBot:
         recommend_strings = f"\n\n{placeholder} FAQs:"
         try:
             for ind, recommend in enumerate(self.top_n_recommended[:recommend_question_cnt]):
-                question = recommend.split('\n')[0]
-                ans = recommend.split('\n')[1]
+                ans = recommend.split('Answers:')[1].split("Contacts:")[0]
+                question = ans.split('Questions:')[1]
                 self.logger.info(f"About to translate {question}")
                 transcribed_question = translate(question,
                                                  language=self.language) if self.language != "Chinese" else question
