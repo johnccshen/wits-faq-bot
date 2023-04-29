@@ -46,8 +46,8 @@ class FaqBot:
         introduction = 'The following is a conversation with an AI assistant. ' \
                        'The assistant is helpful, creative, clever, and very friendly.' \
                        '運用以下的FAQ來回答問題，並附上聯絡人資訊。' \
-                       '如果無法利用FAQ來回答問題，請回答：(很抱歉，我無法回答以上問題，請聯絡8855。\n' \
-                       'Sorry it is out of my knowledge. Please contact 8855 for further assistance)'
+                       '如果無法利用FAQ來回答問題，請回答：(很抱歉，我無法回答以上問題，請聯絡8855。' \
+                       '\nSorry it is out of my knowledge. Please contact 8855 for further assistance)'
         question = f"\n\nQuestion: {query}"
         message = introduction
         for string in strings:
