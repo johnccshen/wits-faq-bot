@@ -5,6 +5,7 @@ import os
 import json
 import structlog
 from src.faq_bot import FaqBot
+from audio import generate_audio_and_upload
 import openai
 app = Flask(__name__)
 logger = structlog.getLogger()
@@ -36,14 +37,7 @@ def linebot():
             if event.get('message'):
                 reply_messages = []
                 if event['message']['type'] == 'text':
-                    text = event['message']['text']
-                    query = text.lower()
-                    if query.startswith(LEADING_STR_CHINESE):
-                        question = query.split(LEADING_STR_CHINESE)[1] + '並以中文回答'
-                    elif query.startswith(LEADING_STR_ENG):
-                        question = query.split(LEADING_STR_ENG)[1] + 'and answer in English'
-                    else:
-                        return 'OK'
+                    question = event['message']['text']
                     logger.info(f"Get text question {question}")
                 elif event['message']['type'] == 'audio':
                     message_id = event['message']['id']
@@ -64,9 +58,13 @@ def linebot():
                     transcribed_msg = f"Get audio question: {question}"
                     logger.info(transcribed_msg)
                     reply_messages.append(TextSendMessage(transcribed_msg))
-
+                    # reply_messages.append(AudioMessage(original_content_url=generate_audio_and_upload(
+                    #     transcribed_msg,
+                    #     message_id))
+                    # )
                 else:
                     return 'OK'
+                logger.info("Asking")
                 is_success, msg = faq_bot.ask(question)
                 # if not is_success:
                 #     msg = faq_bot.general_ask(question)
@@ -81,12 +79,12 @@ def linebot():
                             actions=[
                                 PostbackTemplateAction(
                                     label='Yes',
-                                    text='yes',
+                                    text='Yes',
                                     data='Glad you love it. 😎'
                                 ),
                                 PostbackTemplateAction(
                                     label='No, help me!',
-                                    text='no',
+                                    text='No, help me!',
                                     data='Send notification to the administrator.\n'
                                          'John will help you in person. Please wait.🙏🏾'
                                          'Relax first!🥳\nhttps://youtu.be/Jh4QFaPmdss'
@@ -109,5 +107,5 @@ def linebot():
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
-    # print(faq_bot.ask('怎麼退便當'))
+    # print(faq_bot.ask('我明天要請個人假'))
     # print(f"Cost: {faq_bot.total_cost:.6f}")
