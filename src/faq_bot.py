@@ -94,11 +94,12 @@ class FaqBot:
             for ind, recommend in enumerate(recommend_questions):
                 recommend_strings += f"\nRecommend Ans {ind+1}:\n{recommend}"
             if "Please contact 8855" in response_message:
+                recommend_strings = "These are the top 3 recommended FAQ"
                 response = openai.Completion.create(
                     model="text-davinci-003",
                     prompt=f"Translate this into English:\n\n{recommend_strings}\n\n1.",
-                    temperature=0.3,
-                    max_tokens=100,
+                    temperature=1,
+                    max_tokens=5000,
                     top_p=1.0,
                     frequency_penalty=0.0,
                     presence_penalty=0.0
