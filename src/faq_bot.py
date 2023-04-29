@@ -89,7 +89,7 @@ class FaqBot:
             recommend_questions, _ = self.strings_ranked_by_relatedness(query, df, top_n=3)
             recommend_strings = ""
             for ind, recommend in enumerate(recommend_questions):
-                recommend_strings += f"\nRecommend Ans {ind}:\n{recommend}\n\n"
+                recommend_strings += f"\nRecommend Ans {ind+1}:\n{recommend}"
             response_message += recommend_strings
         return is_succeed, response_message
 
