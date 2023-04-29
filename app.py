@@ -64,6 +64,7 @@ def linebot():
                     # )
                 else:
                     return 'OK'
+                logger.info("Asking")
                 is_success, msg = faq_bot.ask(question)
                 # if not is_success:
                 #     msg = faq_bot.general_ask(question)
@@ -78,12 +79,12 @@ def linebot():
                             actions=[
                                 PostbackTemplateAction(
                                     label='Yes',
-                                    text='yes',
+                                    text='Yes',
                                     data='Glad you love it. 😎'
                                 ),
                                 PostbackTemplateAction(
                                     label='No, help me!',
-                                    text='no',
+                                    text='No, help me!',
                                     data='Send notification to the administrator.\n'
                                          'John will help you in person. Please wait.🙏🏾'
                                          'Relax first!🥳\nhttps://youtu.be/Jh4QFaPmdss'
