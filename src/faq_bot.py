@@ -20,7 +20,7 @@ class FaqBot:
             query: str,
             df: pd.DataFrame,
             relatedness_fn=lambda x, y: 1 - spatial.distance.cosine(x, y),
-            top_n: int = 50
+            top_n: int = 15
     ) -> tuple[list[str], list[float]]:
         """Returns a list of strings and relatednesses, sorted from most related to least."""
         cost, query_embedding_response = self.openai_embedding_service.embedding(query)
