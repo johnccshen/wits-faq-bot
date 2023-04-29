@@ -9,8 +9,6 @@ from gtts import gTTS
 logger = structlog.getLogger()
 
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
-
-
 api_service_name = "drive"
 api_version = "v3"
 
@@ -20,6 +18,7 @@ def upload_to_gdrive(file_path):
         # create drive api client
         service = build(api_service_name, api_version, developerKey=GOOGLE_API_KEY)
         file_metadata = {'name': file_path}
+        logger.info(f"About to upload file {file_path}")
         media = MediaFileUpload(file_path)
         file = service.files().create(body=file_metadata, media_body=media,
                                       fields='id').execute()
