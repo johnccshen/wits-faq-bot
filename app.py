@@ -52,7 +52,7 @@ def linebot():
                 reply_messages = []
                 if event['message']['type'] == 'text':
                     question = event['message']['text']
-                    logger.info(f"Get text question {text}")
+                    logger.info(f"Get text question {question}")
                 elif event['message']['type'] == 'audio':
                     question = get_audio_text(event, line_bot_api)
                     transcribed_msg = f"Get audio question: {question}"
@@ -96,6 +96,6 @@ def linebot():
 
 
 if __name__ == "__main__":
-    # port = int(os.environ.get('PORT', 5000))
-    # app.run(host='0.0.0.0', port=port)
-    print(FaqAnswerBot('What can I do if I am sick').answer())
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
+    # print(FaqAnswerBot('What can I do if I am sick').answer())
