@@ -58,7 +58,7 @@ def linebot():
                     question = get_audio_text(event, line_bot_api)
                     transcribed_msg = f"Get audio question: {question}"
                     logger.info(transcribed_msg)
-                    line_bot_api.reply_message(token, TextSendMessage(transcribed_msg))
+                    reply_messages.append(TextSendMessage(transcribed_msg))
                 else:
                     return 'OK'
                 faq_answer_bot = FaqAnswerBot(question)
