@@ -90,7 +90,7 @@ def linebot():
                 line_bot_api.reply_message(token, reply_messages)       # 回傳訊息
     except Exception as e:
         token = json_data['events'][0]['replyToken']   # 取得 reply token
-        text_message = TextSendMessage(f'嘿咕壞了 {e}')  # 設定回傳同樣的訊息
+        text_message = TextSendMessage(f'請再問一次')  # 設定回傳同樣的訊息
         line_bot_api = LineBotApi(LINE_TOKEN)
         line_bot_api.reply_message(token, text_message)  # 回傳訊息
     return 'OK'

@@ -3,7 +3,7 @@ import ast
 import pandas as pd
 from scipy import spatial
 from . import GPT_MODEL, EMBEDDING_MODEL, EMBEDDING_PATH
-from openai_service import num_tokens
+from .faq import num_tokens
 from asyncer import asyncify
 
 
